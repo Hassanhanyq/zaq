@@ -166,6 +166,15 @@ defmodule ZaqWeb.Router do
     import Phoenix.LiveDashboard.Router
     import PhoenixStorybook.Router
 
+    scope "/" do
+      storybook_assets()
+    end
+
+    scope "/storybook" do
+      pipe_through :browser
+      live_storybook "/", backend_module: ZaqWeb.Storybook
+    end
+
     scope "/dev" do
       pipe_through :browser
 
