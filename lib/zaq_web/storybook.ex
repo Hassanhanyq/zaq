@@ -1,4 +1,5 @@
 defmodule ZaqWeb.Storybook do
+  @moduledoc false
   use PhoenixStorybook,
     otp_app: :zaq,
     content_path: Path.expand("../../storybook", __DIR__),

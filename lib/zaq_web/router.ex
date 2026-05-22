@@ -167,7 +167,7 @@ defmodule ZaqWeb.Router do
 
     scope "/storybook" do
       pipe_through :browser
-      live_storybook "/", backend_module: ZaqWeb.Storybook
+      live_storybook("/", backend_module: ZaqWeb.Storybook)
     end
 
     scope "/dev" do
