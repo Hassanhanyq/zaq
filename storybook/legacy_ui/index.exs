@@ -1,4 +1,5 @@
 %{
   name: "Legacy UI",
-  description: "Components that predate the design system. May be migrated or replaced in future iterations."
+  description: "Components that predate the design system. May be migrated or replaced in future iterations.",
+  folder_index: 3
 }

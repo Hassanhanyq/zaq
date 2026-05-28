@@ -28,7 +28,7 @@ defmodule Storybook.Welcome do
           description="Raw design tokens — color palette, typography, spacing, and scale. The primitives everything else is built from."
         />
         <.section_card
-          label="Semantic"
+          label="Semantics"
           description="Role-based tokens — how raw values map to purpose: colors by role, border radii, and shadow elevation."
         />
         <.section_card

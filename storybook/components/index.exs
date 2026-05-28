@@ -1,4 +1,5 @@
 %{
   name: "Components",
-  description: "All ZAQ UI components — modals, inputs, icons, layouts, and more."
+  description: "All ZAQ UI components — modals, inputs, icons, layouts, and more.",
+  folder_index: 2
 }
