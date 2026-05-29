@@ -11,91 +11,91 @@
   /* ============================================
    FOUNDATION TOKENS — Typography
    ============================================ */
-  --font-family-heading: "Hanken Grotesk", sans-serif;
-  --font-family-body:    "Inter", system-ui, sans-serif;
-  --font-family-code:    "JetBrains Mono", ui-monospace, monospace;
+  --zaq-font-family-heading: "Hanken Grotesk", sans-serif;
+  --zaq-font-family-body:    "Inter", system-ui, sans-serif;
+  --zaq-font-family-code:    "JetBrains Mono", ui-monospace, monospace;
 
-  --font-weight-regular:  400;
-  --font-weight-semibold: 600;
+  --zaq-font-weight-regular:  400;
+  --zaq-font-weight-semibold: 600;
 
-  --line-height-tight:   1.2;
-  --line-height-normal:  1.4;
-  --line-height-relaxed: 1.6;
+  --zaq-line-height-tight:   1.2;
+  --zaq-line-height-normal:  1.4;
+  --zaq-line-height-relaxed: 1.6;
 
-  --letter-spacing-default: 0;
-  --letter-spacing-relaxed: 0.1em;
+  --zaq-letter-spacing-default: 0;
+  --zaq-letter-spacing-relaxed: 0.1em;
 
   /* ============================================
    FOUNDATION TOKENS — Color Palette
    ============================================ */
   /* ── Zaq Color Palette (light) ──────────────────────────────────────────── */
-  --color-blue-400:    #027589;
-  --color-blue-300:    #03b6d4;
-  --color-blue-200:    #cdf0f6;
-  --color-blue-100:    #e6f8fb;
+  --zaq-color-blue-400:    #027589;
+  --zaq-color-blue-300:    #03b6d4;
+  --zaq-color-blue-200:    #cdf0f6;
+  --zaq-color-blue-100:    #e6f8fb;
 
-  --color-black-400:   #0C1324;
-  --color-black-300:   #293442;
-  --color-black-200:   #43536d;
-  --color-black-100:   #69778A;
+  --zaq-color-black-400:   #0C1324;
+  --zaq-color-black-300:   #293442;
+  --zaq-color-black-200:   #43536d;
+  --zaq-color-black-100:   #69778A;
 
-  --color-neutral-400: #acb3bd;
-  --color-neutral-300: #e2e8f0;
-  --color-neutral-200: #fafafa;
-  --color-neutral-100: #ffffff;
+  --zaq-color-neutral-400: #acb3bd;
+  --zaq-color-neutral-300: #e2e8f0;
+  --zaq-color-neutral-200: #fafafa;
+  --zaq-color-neutral-100: #ffffff;
 
-  --color-system-red:    #ea003e;
-  --color-system-green:  #00baa6;
-  --color-system-blue:   #2a7eff;
-  --color-system-orange: #df6f00;
+  --zaq-color-system-red:    #ea003e;
+  --zaq-color-system-green:  #00baa6;
+  --zaq-color-system-blue:   #2a7eff;
+  --zaq-color-system-orange: #df6f00;
 
 /* ============================================
    FOUNDATION TOKENS — Scale
    Base 8px grid. Raw values only (some exception using base 2px grid for text-styles). 
    ============================================ */
-  --scale-0:    0px;
-  --scale-2:    2px;
-  --scale-4:    4px;
-  --scale-8:    8px;
-  --scale-10:   10px; /*only for small text only in BO*/
-  --scale-12:   12px; /*only small text*/
-  --scale-14:   14px; /*default texts for BO*/
-  --scale-16:   16px;
-  --scale-20:   20px; /*Bo text style in header*/
-  --scale-24:   24px;
-  --scale-32:   32px;
-  --scale-40:   40px;
-  --scale-48:   48px;   
-  --scale-56:   56px;
-  --scale-64:   64px;
-  --scale-72:   72px;
-  --scale-80:   80px;
-  --scale-88:   88px;
-  --scale-96:   96px;
-  --scale-120:  120px;
-  --scale-999:  999px;  /* pill radius */
-  --scale-1440: 1440px; /* desktop max-width */
+  --zaq-scale-0:    0px;
+  --zaq-scale-2:    2px;
+  --zaq-scale-4:    4px;
+  --zaq-scale-8:    8px;
+  --zaq-scale-10:   10px; /*only for small text only in BO*/
+  --zaq-scale-12:   12px; /*only small text*/
+  --zaq-scale-14:   14px; /*default texts for BO*/
+  --zaq-scale-16:   16px;
+  --zaq-scale-20:   20px; /*Bo text style in header*/
+  --zaq-scale-24:   24px;
+  --zaq-scale-32:   32px;
+  --zaq-scale-40:   40px;
+  --zaq-scale-48:   48px;   
+  --zaq-scale-56:   56px;
+  --zaq-scale-64:   64px;
+  --zaq-scale-72:   72px;
+  --zaq-scale-80:   80px;
+  --zaq-scale-88:   88px;
+  --zaq-scale-96:   96px;
+  --zaq-scale-120:  120px;
+  --zaq-scale-999:  999px;  /* pill radius */
+  --zaq-scale-1440: 1440px; /* desktop max-width */
 }
 
 /* ── Dark palette ────────────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --color-blue-400:    #0aadca;
-  --color-blue-300:    #3dd5ee;
-  --color-blue-200:    #083d52;
-  --color-blue-100:    #031d2a;
+  --zaq-color-blue-400:    #0aadca;
+  --zaq-color-blue-300:    #3dd5ee;
+  --zaq-color-blue-200:    #083d52;
+  --zaq-color-blue-100:    #031d2a;
 
-  --color-black-400:   #F3F5F7;
-  --color-black-300:   #D8E2EF;
-  --color-black-200:   #A0B2C8;
-  --color-black-100:   #72879F;
+  --zaq-color-black-400:   #F3F5F7;
+  --zaq-color-black-300:   #D8E2EF;
+  --zaq-color-black-200:   #A0B2C8;
+  --zaq-color-black-100:   #72879F;
 
-  --color-neutral-400: #1B2D3E;
-  --color-neutral-300: #161F2E;
-  --color-neutral-200: #0C1324;
-  --color-neutral-100: #081017;
+  --zaq-color-neutral-400: #1B2D3E;
+  --zaq-color-neutral-300: #161F2E;
+  --zaq-color-neutral-200: #0C1324;
+  --zaq-color-neutral-100: #081017;
 
-  --color-system-red:    #ff2d55;
-  --color-system-green:  #0fd4bf;
-  --color-system-blue:   #5b9fff;
-  --color-system-orange: #f78514;
+  --zaq-color-system-red:    #ff2d55;
+  --zaq-color-system-green:  #0fd4bf;
+  --zaq-color-system-blue:   #5b9fff;
+  --zaq-color-system-orange: #f78514;
 }
