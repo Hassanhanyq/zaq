@@ -1,10 +1,32 @@
-const { chromium, request } = require("@playwright/test");
+const { request } = require("@playwright/test");
 const fs = require("fs");
 const path = require("path");
 
-const STORY_LINK_SELECTOR = "section#sidebar a[href^='/storybook'][data-phx-link='patch']";
 const OUTPUT_PATH = path.join(__dirname, "story-urls.json");
 const BASE_URL = "http://localhost:4000";
+// Storybook files live two directories up from this support/ folder
+const STORYBOOK_DIR = path.join(__dirname, "..", "..", "..", "storybook");
+
+// Derive the Storybook URL path from a .story.exs file path.
+// e.g. storybook/components/forms/button.story.exs → /storybook/components/forms/button
+function fileToUrl(filePath) {
+  const rel = path.relative(STORYBOOK_DIR, filePath);
+  const withoutExt = rel.replace(/\.story\.exs$/, "");
+  return "/storybook/" + withoutExt.split(path.sep).join("/");
+}
+
+function discoverStoryFiles(dir) {
+  const results = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...discoverStoryFiles(full));
+    } else if (entry.isFile() && entry.name.endsWith(".story.exs")) {
+      results.push(full);
+    }
+  }
+  return results;
+}
 
 module.exports = async () => {
   // globalSetup runs before webServer starts. Poll until the dev server is ready.
@@ -25,30 +47,17 @@ module.exports = async () => {
     throw new Error(`Dev server at ${BASE_URL}/storybook did not become ready in 90s.`);
   }
 
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+  // Discover stories from the filesystem — sidebar-based discovery misses
+  // stories in collapsed folders that are not rendered in the DOM.
+  const storyFiles = discoverStoryFiles(STORYBOOK_DIR);
+  const urls = storyFiles.map(fileToUrl).sort();
 
-  try {
-    await page.goto(`${BASE_URL}/storybook`);
-    await page.locator(STORY_LINK_SELECTOR).waitFor({ timeout: 15_000 });
-
-    const hrefs = await page.$$eval(STORY_LINK_SELECTOR, (links) =>
-      [...new Set(links.map((a) => a.getAttribute("href")).filter(Boolean))]
+  if (urls.length === 0) {
+    throw new Error(
+      `No .story.exs files found under ${STORYBOOK_DIR}. Check the path.`
     );
-
-    if (hrefs.length === 0) {
-      throw new Error(
-        [
-          "Sidebar discovery returned 0 story links.",
-          `Selector used: ${STORY_LINK_SELECTOR}`,
-          "Open http://localhost:4000/storybook in DevTools and verify the selector.",
-        ].join("\n")
-      );
-    }
-
-    fs.writeFileSync(OUTPUT_PATH, JSON.stringify(hrefs, null, 2));
-    console.log(`[storybook smoke] Discovered ${hrefs.length} stories → ${OUTPUT_PATH}`);
-  } finally {
-    await browser.close();
   }
+
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(urls, null, 2));
+  console.log(`[storybook smoke] Discovered ${urls.length} stories → ${OUTPUT_PATH}`);
 };

@@ -21,7 +21,7 @@ module.exports = defineConfig({
   },
   webServer: {
     command: "sh -c 'cd ../.. && mix phx.server'",
-    url: "http://localhost:4000/storybook",
+    url: "http://localhost:4000/bo/login",
     // Reuses running dev server locally (fast), starts fresh on CI (safe).
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
