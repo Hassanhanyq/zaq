@@ -50,7 +50,9 @@ defmodule Storybook.Foundations.Spacing do
       <span style="font-family: ui-monospace, monospace; font-size: 0.7rem; opacity: 0.5; text-align: right;">
         {@px}
       </span>
-      <div style={"height: 12px; border-radius: 3px; background: var(--zaq-color-surface-accent, #03b6d4); width: var(#{@token}, #{@px}); max-width: 100%; min-width: 2px;"}>
+      <div style="overflow: hidden; min-width: 0;">
+        <div style={"height: 12px; border-radius: 3px; background: var(--zaq-color-blue-400, #1a6ef5); width: var(#{@token}, #{@px}); max-width: 100%; min-width: 2px;"}>
+        </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 0.1rem;">
         <span style="font-family: ui-monospace, monospace; font-size: 0.65rem; opacity: 0.35;">
