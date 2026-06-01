@@ -7,7 +7,7 @@ defmodule Storybook.Foundations.Palette do
 
   def render(assigns) do
     ~H"""
-    <div style="font-family: var(--zaq-font-primary, sans-serif); padding: 2rem; display: flex; flex-direction: column; gap: 3rem;">
+    <div style="font-family: var(--zaq-font-family-body, sans-serif); padding: 2rem; display: flex; flex-direction: column; gap: 3rem;">
       <div style="background: rgba(255, 200, 60, 0.1); border: 1px solid rgba(255, 180, 0, 0.3); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.75rem; line-height: 1.5; color: inherit;">
         <strong style="font-weight: 600;">Foundation tokens are source values only.</strong>
         They exist to define semantic tokens — never reference them directly in components or pages.
@@ -20,10 +20,10 @@ defmodule Storybook.Foundations.Palette do
           Blue
         </h2>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
-          <.swatch name="blue-400" var="--zaq-color-blue-400" />
-          <.swatch name="blue-300" var="--zaq-color-blue-300" />
-          <.swatch name="blue-200" var="--zaq-color-blue-200" />
-          <.swatch name="blue-100" var="--zaq-color-blue-100" />
+          <.swatch name="blue-400" var="--zaq-color-blue-400" usage="→ border/accent" />
+          <.swatch name="blue-300" var="--zaq-color-blue-300" usage="→ border/accent" />
+          <.swatch name="blue-200" var="--zaq-color-blue-200" usage="→ surface/accent" />
+          <.swatch name="blue-100" var="--zaq-color-blue-100" usage="→ surface/accent (light)" />
         </div>
       </section>
 
@@ -32,10 +32,10 @@ defmodule Storybook.Foundations.Palette do
           Black / Ink
         </h2>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
-          <.swatch name="black-400" var="--zaq-color-black-400" />
-          <.swatch name="black-300" var="--zaq-color-black-300" />
-          <.swatch name="black-200" var="--zaq-color-black-200" />
-          <.swatch name="black-100" var="--zaq-color-black-100" />
+          <.swatch name="black-400" var="--zaq-color-black-400" usage="→ text/body/default" />
+          <.swatch name="black-300" var="--zaq-color-black-300" usage="→ surface/dark (sidebar)" />
+          <.swatch name="black-200" var="--zaq-color-black-200" usage="→ text/body/secondary" />
+          <.swatch name="black-100" var="--zaq-color-black-100" usage="→ text/body/tertiary" />
         </div>
       </section>
 
@@ -44,10 +44,10 @@ defmodule Storybook.Foundations.Palette do
           Neutral
         </h2>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
-          <.swatch name="neutral-400" var="--zaq-color-neutral-400" />
-          <.swatch name="neutral-300" var="--zaq-color-neutral-300" />
-          <.swatch name="neutral-200" var="--zaq-color-neutral-200" />
-          <.swatch name="neutral-100" var="--zaq-color-neutral-100" border />
+          <.swatch name="neutral-400" var="--zaq-color-neutral-400" usage="→ border/strong" />
+          <.swatch name="neutral-300" var="--zaq-color-neutral-300" usage="→ border/default, surface/elevated" />
+          <.swatch name="neutral-200" var="--zaq-color-neutral-200" usage="→ surface/base" />
+          <.swatch name="neutral-100" var="--zaq-color-neutral-100" border usage="→ surface/raised, text/body/invert" />
         </div>
       </section>
 
@@ -56,10 +56,10 @@ defmodule Storybook.Foundations.Palette do
           System
         </h2>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
-          <.swatch name="system-red" var="--zaq-color-system-red" />
-          <.swatch name="system-green" var="--zaq-color-system-green" />
-          <.swatch name="system-blue" var="--zaq-color-system-blue" />
-          <.swatch name="system-orange" var="--zaq-color-system-orange" />
+          <.swatch name="system-red" var="--zaq-color-system-red" usage="→ border/error" />
+          <.swatch name="system-green" var="--zaq-color-system-green" usage="→ success states" />
+          <.swatch name="system-blue" var="--zaq-color-system-blue" usage="→ info states" />
+          <.swatch name="system-orange" var="--zaq-color-system-orange" usage="→ warning states" />
         </div>
       </section>
     </div>
@@ -67,6 +67,8 @@ defmodule Storybook.Foundations.Palette do
   end
 
   defp swatch(assigns) do
+    assigns = Map.put_new(assigns, :usage, nil)
+
     ~H"""
     <div style="display: flex; flex-direction: column; gap: 0.4rem;">
       <div style={"height: 48px; border-radius: 8px; background: var(#{@var}); #{if Map.get(assigns, :border), do: "border: 1px solid rgba(0,0,0,0.08);"}"}>
@@ -77,6 +79,11 @@ defmodule Storybook.Foundations.Palette do
       <span style="font-size: 0.65rem; opacity: 0.35; font-family: ui-monospace, monospace;">
         {@var}
       </span>
+      <%= if @usage do %>
+        <span style="font-size: 0.6rem; opacity: 0.4; font-family: ui-monospace, monospace; font-style: italic;">
+          {@usage}
+        </span>
+      <% end %>
     </div>
     """
   end
