@@ -24,19 +24,61 @@ The LiveView must assign `current_path` (the request path string, e.g. `"/bo/my-
 
 ---
 
-## Design tokens — always use CSS variables, never hardcode colors
+## Styling Priority
 
-| Token | Value | Use for |
-|---|---|---|
-| `var(--zaq-color-accent)` | `#03b6d4` | Primary actions, active states, links |
-| `var(--zaq-color-accent-hover)` | `#029ab3` | Hover on accent elements |
-| `var(--zaq-color-accent-soft)` | `rgba(3,182,212,0.10)` | Subtle accent backgrounds |
-| `var(--zaq-color-ink)` | `#2c3a50` | Body text, sidebar background |
-| `var(--zaq-color-ink-soft)` | `#5c5a55` | Secondary / muted text |
-| `var(--zaq-color-surface)` | `#faf9f7` | Page background |
-| `var(--zaq-color-surface-border)` | `#e8e6e1` | Card / divider borders |
+Apply styles in this exact order. Later steps are only acceptable if earlier steps are impossible.
 
-Prefer the utility classes defined in `assets/css/app.css` over raw `var(...)` where one exists:
+1. **Use an existing class** from `styles.css`, `semantics.css`, `text-styles.css`, or `btn.css`.
+   - Classes in `app.css` are **off-limits** — they are legacy/deprecated.
+2. **Buttons** — always use `.zaq-btn-primary` or `.zaq-btn-secondary` from `btn.css`.
+   No new button styles. No daisyUI button classes.
+3. **Text** — always use the closest `.zaq-text-*` class from `text-styles.css`.
+   No Tailwind text sizing (`text-sm`, `text-lg`, `text-[*]`). No inline font vars.
+   Text decorations (`uppercase`, `underline`, `tracking-*`) are acceptable alongside a `.zaq-text-*` base.
+4. **New class needed** → add a new semantic utility class to `styles.css` only. Never `app.css`.
+5. **No class fits** → use a semantic var inline:
+   `--zaq-surface-color-*`, `--zaq-text-color-*`, or `--zaq-border-color-*`.
+   Never foundation vars (`--zaq-color-blue-*`, `--zaq-color-neutral-*`, `--zaq-color-black-*`).
+6. **Tailwind** → fallback for layout and spacing only. Never color. Never typography.
+
+### Text style mapping
+
+| Role | Class |
+|---|---|
+| Page/section heading | `.zaq-text-h1` → `.zaq-text-h5` |
+| Body copy (large) | `.zaq-text-body-lg` |
+| Body copy (default) | `.zaq-text-body` |
+| Body copy (small), table content | `.zaq-text-body-sm` |
+| Meta / supporting / compact labels | `.zaq-text-caption` |
+| Code / monospace | `.zaq-text-code` |
+| Pre-formatted block | `.zaq-text-pre` |
+| Button label | `.zaq-btn-text_label-default` (inside buttons only) |
+
+When ambiguous between adjacent scales, prefer the smaller one. Map by visual role, not pixel size.
+
+### Forbidden patterns
+
+- Any class from `app.css` (`.zaq-bg-ink`, `.zaq-text-accent`, `.zaq-bg-accent-soft`, etc.)
+- Hardcoded hex, rgb, oklch, or hsl color values in templates
+- Foundation vars in templates (`var(--zaq-color-blue-400)`, `var(--zaq-color-neutral-*)`)
+- Tailwind color or typography classes (`text-gray-600`, `bg-white`, `font-mono`, `text-sm`)
+- daisyUI component classes in BO templates
+
+## Design tokens (deprecated)
+
+The `--zaq-color-*` variables and the utility classes below are the old token system defined in `app.css`. Do not use them in new components. Do not add new classes to `app.css`.
+
+| Token | Legacy use |
+|---|---|
+| `var(--zaq-color-accent)` | Primary actions, active states, links |
+| `var(--zaq-color-accent-hover)` | Hover on accent elements |
+| `var(--zaq-color-accent-soft)` | Subtle accent backgrounds |
+| `var(--zaq-color-ink)` | Body text, sidebar background |
+| `var(--zaq-color-ink-soft)` | Secondary / muted text |
+| `var(--zaq-color-surface)` | Page background |
+| `var(--zaq-color-surface-border)` | Card / divider borders |
+
+Legacy utility classes from `app.css` (do not use in new components):
 
 ```
 zaq-bg-ink          zaq-bg-accent         zaq-bg-accent-soft
@@ -48,9 +90,9 @@ zaq-border-accent   zaq-border-accent-soft
 
 ## Typography
 
-- **All text in BO uses `font-mono`** (maps to `var(--zaq-font-primary)` — ZAQ Sans / Roboto).
-- Common size scale: labels `text-[0.7rem]`, body `text-[0.82rem]`, page title `text-lg font-bold`.
-- Section labels in the sidebar use `text-[0.58rem] uppercase tracking-widest`.
+Use `.zaq-text-*` classes from `text-styles.css` — see the Text style mapping table in the Styling Priority section above. Do not use `font-mono`, Tailwind text-sizing utilities, or inline font vars.
+
+Decorative modifiers (`uppercase`, `tracking-widest`, `underline`) are acceptable alongside a `.zaq-text-*` base class when the role calls for them (e.g. sidebar section labels).
 
 ---
 
@@ -59,7 +101,7 @@ zaq-border-accent   zaq-border-accent-soft
 Standard BO content cards follow this shell:
 
 ```heex
-<div class="bg-white rounded-xl border border-black/10 p-5">
+<div class="zaq-card-default">
   <%!-- content --%>
 </div>
 ```
@@ -70,10 +112,10 @@ Use `BOLayout.diagnostic_card/1`, `BOLayout.config_row/1`, and `BOLayout.feature
 
 ## Buttons
 
-- **Primary action**: `font-mono text-[0.75rem] font-bold px-4 py-2 rounded-lg zaq-bg-accent text-white hover:bg-[var(--zaq-color-accent-hover)] transition-colors`
-- **Secondary / ink**: `font-mono text-[0.75rem] font-bold px-4 py-2 rounded-lg zaq-bg-ink text-white hover:opacity-80 transition-colors`
-- **Destructive**: replace background with `bg-red-600 hover:bg-red-700`
-- Never use daisyUI. Always write Tailwind classes manually.
+- **Primary action**: use `.zaq-btn-primary` from `btn.css`.
+- **Secondary action**: use `.zaq-btn-secondary` from `btn.css`.
+- **Destructive**: use `.zaq-btn-destructive` from `btn.css` if available; otherwise extend `btn.css` — do not write one-off Tailwind button styles.
+- Never use daisyUI button classes. Never hand-roll button styles with `font-mono`, `zaq-bg-accent`, or `bg-red-*`.
 
 ---
 
@@ -179,9 +221,12 @@ Before writing any markup from scratch, check whether one of these components al
 ## Checklist before opening a PR for any BO UI change
 
 - [ ] Template opens with `<ZaqWeb.Components.BOLayout.bo_layout ...>` and `current_path` is assigned
-- [ ] No hardcoded hex colors — use CSS variables or utility classes
-- [ ] All text uses `font-mono` (or inherits it from the layout)
-- [ ] New cards follow the `bg-white rounded-xl border border-black/10` pattern
+- [ ] No hardcoded hex, rgb, oklch, or hsl color values in templates
+- [ ] No `font-mono`, `text-sm`, `text-[*]`, `bg-white`, or other Tailwind color/typography classes
+- [ ] No classes from `app.css` (`.zaq-bg-ink`, `.zaq-text-accent`, `.zaq-bg-accent-soft`, etc.)
+- [ ] All text uses a `.zaq-text-*` class from `text-styles.css`
+- [ ] All buttons use `.zaq-btn-primary` or `.zaq-btn-secondary` from `btn.css`
+- [ ] New cards use `zaq-card-default` (not `bg-white border-black/10`)
 - [ ] Icons use `<.icon>` or `IconRegistry.icon`, not `Heroicons.*`
 - [ ] No `<.flash_group>` in the template
 - [ ] `mix precommit` passes
