@@ -110,6 +110,20 @@ Say: "Changes applied and verified. Run `mix q` before opening the PR. Files cha
 
 ---
 
+## Batching Multiple Components
+
+You can migrate several components in one session before applying any of them to the app. After Step 4 for each component, it is `staged` (Storybook updated, not yet in app templates). After Step 5, it is `approved` (app template updated).
+
+To batch:
+1. Run Steps 1–4 for component A → it is now `staged`
+2. Run Steps 1–4 for component B → it is now `staged`
+3. When ready to ship, list all staged components and apply Step 5 for each in one pass
+4. Run verification once across the full batch, then open one PR
+
+Keep track of staged vs approved state in the conversation. There is no persistent state file — batching is session-scoped only.
+
+---
+
 ## Full Sweep (`--audit-all`)
 
 Sweep all files under `lib/zaq_web/` and `assets/css/`. For each file, flag violations by severity:
