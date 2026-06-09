@@ -12,6 +12,26 @@ You are migrating ZAQ's styling incrementally to the `--zaq-*` token system.
 
 ---
 
+## File Write Restrictions (enforced — never override)
+
+You may ONLY write to files in these directories:
+
+| Allowed path | Rule |
+|---|---|
+| `assets/css/styles.css` | The only CSS file you may write to. All other CSS files are read-only. |
+| `lib/zaq_web/components/` | Shared component files only. No LiveView pages, no routers, no contexts. |
+| `storybook/` | Storybook story files only. |
+
+**Explicitly forbidden:**
+- `assets/css/app.css` — no edits, ever
+- `assets/css/foundations.css`, `semantics.css`, `text-styles.css`, `btn.css` — read-only
+- `lib/zaq_web/live/` — no LiveView page files
+- Any file outside the three allowed directories above
+
+If an approved diff line requires touching a file outside these directories, stop and say: "This change requires editing [file], which is outside the allowed directories. Consult the project team before proceeding."
+
+---
+
 ## Step 1: Detect Mode
 
 Parse the input after `/design-migrate`:
