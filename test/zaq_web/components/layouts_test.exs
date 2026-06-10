@@ -3,6 +3,7 @@ defmodule ZaqWeb.LayoutsTest do
 
   import Phoenix.LiveViewTest
 
+  alias ZaqWeb.Components.FigmaCaptureScript
   alias ZaqWeb.Layouts
 
   test "app/1 renders shell and inner content" do
@@ -32,5 +33,18 @@ defmodule ZaqWeb.LayoutsTest do
     assert html =~ "data-phx-theme=\"system\""
     assert html =~ "data-phx-theme=\"light\""
     assert html =~ "data-phx-theme=\"dark\""
+  end
+
+  test "figma_capture_script/1 renders script when enabled" do
+    html = render_component(&FigmaCaptureScript.figma_capture_script/1, enabled: true)
+
+    assert html =~ "https://mcp.figma.com/mcp/html-to-design/capture.js"
+    assert html =~ "async"
+  end
+
+  test "figma_capture_script/1 does not render script when disabled" do
+    html = render_component(&FigmaCaptureScript.figma_capture_script/1, enabled: false)
+
+    refute html =~ "https://mcp.figma.com/mcp/html-to-design/capture.js"
   end
 end

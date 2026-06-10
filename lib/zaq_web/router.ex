@@ -9,6 +9,11 @@ defmodule ZaqWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
+
+    plug ZaqWeb.Plugs.AssignConfig,
+      assign: :figma_capture_enabled,
+      config: {:zaq, :figma_capture_enabled, false}
+
     plug :put_root_layout, html: {ZaqWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
