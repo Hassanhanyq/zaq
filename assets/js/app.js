@@ -522,7 +522,7 @@ window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
 // Storybook dark mode bridge
-// Translates Storybook's psb-set-color-mode toggle into both:
+// Translates Storybook's psb:set-color-mode toggle into both:
 //   - data-theme="dark"      → activates DaisyUI's dark theme (legacy BO components)
 //   - data-zaq-theme="dark"  → activates ZAQ foundation token overrides (ZAQ components)
 // Both attributes are always set/removed together so legacy and ZAQ components coexist.
@@ -541,7 +541,7 @@ window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
   const stored = localStorage.getItem("psb_selected_color_mode")
   if (stored) applyPsbTheme(stored)
   // Sync on toggle
-  window.addEventListener("psb-set-color-mode", (e) => applyPsbTheme(e.detail?.mode || "system"))
+  window.addEventListener("psb:set-color-mode", (e) => applyPsbTheme(e.detail?.mode || "system"))
 })()
 
 // connect if there are any LiveViews on the page
