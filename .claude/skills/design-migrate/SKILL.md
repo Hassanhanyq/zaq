@@ -1,6 +1,6 @@
 ---
 name: design-migrate
-description: Migrate ZAQ component or page styling to the --zaq-* token system. Accepts a Figma frame URL (design-led), a file path (audit), or --audit-all (full sweep). Always produces a diff proposal before touching any file. Full sweep mode writes a backlog file directly.
+description: Migrate ZAQ web UI (components, LiveViews, layouts) styling to the --zaq-* token system. Accepts a Figma frame URL (design-led), a file path (audit), or --audit-all (full sweep). Always produces a diff proposal before touching any file. Full sweep mode writes a backlog file directly.
 trigger: when the user types /design-migrate
 ---
 
@@ -19,15 +19,14 @@ You may ONLY write to files in these directories:
 | Allowed path | Rule |
 |---|---|
 | `assets/css/styles.css` | The only CSS file you may write to. |
-| `lib/zaq_web/components/` | Shared component `.ex` files only. No LiveView pages, no routers, no contexts. |
+| `lib/zaq_web/` | All Phoenix web-layer modules: function components, LiveViews, layouts, controllers, HEEX templates, etc. Styling and markup only — do not change business logic, assigns, or event handlers unless the user explicitly asked. |
 
 **Explicitly forbidden:**
 - `assets/css/app.css` — no edits, ever
 - `assets/css/foundations.css`, `semantics.css`, `text-styles.css`, `btn.css` — read-only
-- `lib/zaq_web/live/` — no LiveView page files
-- Any file outside the three allowed directories above
+- `lib/zaq/` and any path outside `lib/zaq_web/` (contexts, schemas, Oban workers, etc.)
 
-If an approved diff line requires touching a file outside these directories, stop and say: "This change requires editing [file], which is outside the allowed directories. Consult the project team before proceeding."
+If an approved diff line requires touching a file outside these allowed paths, stop and say: "This change requires editing [file], which is outside the allowed directories. Consult the project team before proceeding."
 
 ---
 
@@ -38,7 +37,7 @@ Parse the input after `/design-migrate`:
 | Input | Mode |
 |---|---|
 | A `figma.com` URL | Design-led mode |
-| A `figma.com` URL + a file path (e.g. `/design-migrate https://figma.com/... lib/zaq_web/components/bo_layout.ex`) | Design-led mode, target file known |
+| A `figma.com` URL + a file path (e.g. `/design-migrate https://figma.com/... lib/zaq_web/live/bo/people_live.ex`) | Design-led mode, target file known |
 | A file path or component name | Audit mode |
 | `--audit-all` | Full codebase sweep |
 | Nothing | Ask: "Provide a Figma frame URL, a file path, or `--audit-all` for a full sweep." |
@@ -109,7 +108,7 @@ Apply only the approved lines. Write to:
     <property>: var(--zaq-<semantic-token>);
   }
   ```
-- `lib/zaq_web/components/<file>.ex` — the target component file
+- `lib/zaq_web/...` — the target file (component, LiveView, layout, etc.)
 
 Then run:
 
@@ -121,7 +120,9 @@ mix format
 
 After `mix format` passes, run a targeted smoke test:
 
-1. **Identify which LiveViews use the edited component:**
+1. **Pick LiveView(s) to cover the change:**
+   - If the edited file is already a LiveView under `lib/zaq_web/live/`, use that file only.
+   - Otherwise, find LiveViews that reference the edited component:
    ```bash
    grep -rl "ComponentModuleName\b" lib/zaq_web/live/ 2>/dev/null
    ```
@@ -148,9 +149,9 @@ After `mix format` passes, run a targeted smoke test:
    ```bash
    cd test/e2e && npx playwright test specs/agents.spec.js
    ```
-- **No matching spec found:** Say: "No matching e2e spec found for this component. Visual verification in the running app is sufficient." Skip e2e and proceed to Step 5.
+- **No matching spec found:** Say: "No matching e2e spec found for this change. Visual verification in the running app is sufficient." Skip e2e and proceed to Step 5.
 
-Mark this component as `approved` in your in-conversation ledger.
+Mark this target file as `approved` in your in-conversation ledger.
 
 ---
 
