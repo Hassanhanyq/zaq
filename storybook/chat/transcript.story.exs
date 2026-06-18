@@ -29,6 +29,25 @@ defmodule Storybook.Chat.Transcript do
       filters: []
     }
 
+    assistant_with_actions = %{
+      id: "a1",
+      role: :bot,
+      body:
+        "The refund policy allows returns within 30 days of purchase with a valid receipt. I can also summarize related HR policies if you need them.",
+      timestamp: ts,
+      confidence: 0.88,
+      error: false,
+      feedback: nil,
+      sources: [],
+      message_info: %{
+        agent: "ZAQ Assistant",
+        model: "story-model",
+        measurements: %{},
+        traces: []
+      },
+      live: false
+    }
+
     [
       %Variation{
         id: :welcome_only,
@@ -47,6 +66,16 @@ defmodule Storybook.Chat.Transcript do
           messages: [welcome, user_msg],
           status: :thinking,
           status_message: "ZAQ is analyzing your question…",
+          streaming_response_active: false
+        }
+      },
+      %Variation{
+        id: :chat_page_with_assistant_actions,
+        description: "Chat page — user + assistant with message actions (as in BO transcript)",
+        attributes: %{
+          messages: [user_msg, assistant_with_actions],
+          status: :idle,
+          status_message: "",
           streaming_response_active: false
         }
       }

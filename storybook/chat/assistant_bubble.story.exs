@@ -3,9 +3,42 @@ defmodule Storybook.Chat.AssistantBubble do
 
   def function, do: &ZaqWeb.Components.ChatMessage.assistant_bubble/1
 
+  def imports do
+    [
+      {ZaqWeb.Components.ChatMessage,
+       [
+         {:message_info_button, 1},
+         {:copy_action_button, 1},
+         {:feedback_positive_button, 1},
+         {:feedback_negative_button, 1}
+       ]}
+    ]
+  end
+
   def description,
     do:
-      "Left-aligned assistant bubble with confidence and sources (`ZaqWeb.Components.ChatMessage`)."
+      "Left-aligned assistant bubble with confidence and sources (`ZaqWeb.Components.ChatMessage`). " <>
+        "Message actions (info, copy, thumbs up/down) match the BO chat transcript."
+
+  @actions_slot_base """
+  <:actions>
+    <.message_info_button available={true} message_id="story-msg-1" open_event="open_message_info_modal" />
+    <.copy_action_button text="The refund policy allows returns within 30 days of purchase with a valid receipt." />
+  """
+
+  @actions_slot_close """
+  </:actions>
+  """
+
+  defp actions_slot(feedback_positive, feedback_negative) do
+    """
+    #{@actions_slot_base}
+    <.feedback_positive_button message_id="story-msg-1" feedback={#{inspect(feedback_positive)}} />
+    <.feedback_negative_button message_id="story-msg-1" feedback={#{inspect(feedback_negative)}} />
+    #{@actions_slot_close}
+    """
+    |> String.trim()
+  end
 
   def variations do
     [
@@ -70,6 +103,37 @@ defmodule Storybook.Chat.AssistantBubble do
           timestamp: ~N[2024-01-15 10:35:05],
           is_error: true
         }
+      },
+      %Variation{
+        id: :with_message_actions,
+        description: "With transcript message actions (info, copy, feedback)",
+        attributes: %{
+          content:
+            "The refund policy allows returns within 30 days of purchase with a valid receipt.",
+          timestamp: ~N[2024-01-15 10:36:05],
+          confidence: 0.88
+        },
+        slots: [actions_slot(nil, nil)]
+      },
+      %Variation{
+        id: :with_message_actions_positive,
+        description: "Message actions — thumbs up selected",
+        attributes: %{
+          content: "Glad this helped. Let me know if you need anything else.",
+          timestamp: ~N[2024-01-15 10:37:05],
+          confidence: 0.91
+        },
+        slots: [actions_slot(:positive, nil)]
+      },
+      %Variation{
+        id: :with_message_actions_negative,
+        description: "Message actions — thumbs down selected",
+        attributes: %{
+          content: "Here is a shorter answer that may need refinement.",
+          timestamp: ~N[2024-01-15 10:38:05],
+          confidence: 0.42
+        },
+        slots: [actions_slot(nil, :negative)]
       }
     ]
   end
