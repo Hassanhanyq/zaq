@@ -11,6 +11,7 @@
   --zaq-surface-color-elevated: var(--zaq-color-neutral-300);
   --zaq-surface-color-accent:   var(--zaq-color-blue-100);
   --zaq-surface-color-danger:   var(--zaq-color-system-red-100);
+  --zaq-surface-color-danger-strong:   var(--zaq-color-system-red-strong);
   --zaq-surface-color-success:  var(--zaq-color-system-green-100);
   --zaq-surface-color-warning:  var(--zaq-color-system-orange-100);
 

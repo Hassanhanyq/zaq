@@ -3,9 +3,10 @@ defmodule ZaqWeb.Components.ChatMessage do
   @moduledoc """
   Shared chat bubble components used by ChatLive and ConversationDetailLive.
 
-  Both views render the same user/assistant bubble design:
-  - User: right-aligned dark (#2c3a50) bubble
-  - Assistant: left-aligned white card with ZAQ avatar, source chips, confidence bar
+  Both views render the same user/assistant message design:
+  - User: right-aligned dark bubble
+  - Assistant: left-aligned column with ZAQ avatar, flat body on transcript surface,
+    optional danger feedback for structured errors, source rows, confidence bar
 
   Usage:
 
@@ -44,13 +45,15 @@ defmodule ZaqWeb.Components.ChatMessage do
     assigns = assign(assigns, :body_html, build_body_html(assigns.content, assigns.filters))
 
     ~H"""
-    <div class="flex justify-end animate-slide-in-right group">
+    <div class="flex justify-end animate-slide-in-right">
       <div class="max-w-[70%]">
         <div class="text-white px-4 py-3 rounded-2xl rounded-br-none shadow-sm zaq-bg-user-bubble">
           <p class="text-[0.85rem] leading-relaxed whitespace-pre-wrap">{@body_html}</p>
         </div>
-        <div class="flex items-center justify-end gap-2 mt-1 pr-1 msg-actions">
-          <span class="text-[0.62rem] zaq-text-muted">{format_time(@timestamp)}</span>
+        <div class="flex items-center justify-end gap-2 mt-1 pr-1">
+          <span class="zaq-text-caption" style="color: var(--zaq-text-color-body-tertiary);">
+            {format_time(@timestamp)}
+          </span>
           {render_slot(@actions)}
         </div>
       </div>
@@ -83,59 +86,69 @@ defmodule ZaqWeb.Components.ChatMessage do
       |> assign_error_parts()
 
     ~H"""
-    <div class="flex justify-start animate-slide-in-left group">
-      <div class="flex gap-3 max-w-[82%] min-w-0">
-        <%!-- ZAQ avatar --%>
-        <div class="flex-shrink-0 mt-0.5">
-          <img src={~p"/images/zaq.png"} alt="ZAQ" class="w-7 h-7 rounded-lg object-contain" />
+    <div class="flex justify-start min-w-0 animate-slide-in-left">
+      <div class="flex min-w-0 max-w-[82%] gap-4">
+        <div class="shrink-0 mt-0.5">
+          <img
+            src={~p"/images/zaq.png"}
+            alt="ZAQ"
+            class="w-8 h-8 rounded-lg object-contain"
+          />
         </div>
 
         <div class="flex-1 min-w-0">
-          <%!-- Bubble card --%>
-          <div class={[
-            "px-4 py-3 rounded-2xl rounded-bl-none border shadow-sm",
-            if(@is_error, do: "bg-red-50 border-red-200", else: "bg-white zaq-card-border-soft")
-          ]}>
-            <%!-- Error layout: summary + collapsible code box --%>
-            <%= if @is_error && (@error_detail || @error_type != nil) do %>
-              <p class="text-[0.85rem] leading-relaxed text-red-600 mb-2">{@error_summary}</p>
-              <%= if @error_type == :budget_exceeded do %>
-                <%!-- Budget exceeded: prompt user to top up wallet via portal --%>
-                <div class="mt-1 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p class="text-[0.8rem] text-green-800 mb-3">
-                    Top up your wallet to continue using ZAQ Router.
-                  </p>
-                  <a
-                    href={@portal_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[0.78rem] font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+          <%= if @is_error && (@error_detail || @error_type != nil) do %>
+            <%= if @error_type == :budget_exceeded do %>
+              <p
+                class="zaq-text-body-sm leading-relaxed mb-2"
+                style="color: var(--zaq-text-color-body-danger);"
+              >
+                {@error_summary}
+              </p>
+              <div class="mt-1 mb-2">
+                <p class="zaq-text-body-sm mb-3" style="color: var(--zaq-text-color-body-success);">
+                  Top up your wallet to continue using ZAQ Router.
+                </p>
+                <a
+                  href={@portal_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="zaq-btn zaq-btn-primary zaq-btn-text_label-default inline-flex items-center gap-1.5"
+                >
+                  Top up wallet
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   >
-                    Top up wallet
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                  </a>
-                </div>
-              <% else %>
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </div>
+            <% else %>
+              <div
+                class="zaq-feedback-banner zaq-danger zaq-text-body-sm"
+                style="flex-direction: column; align-items: stretch;"
+              >
+                <p class="leading-relaxed mb-2" style="color: inherit;">{@error_summary}</p>
                 <div class="relative">
-                  <pre class="font-mono text-[0.72rem] leading-relaxed text-red-700 bg-red-100/60 border border-red-200 rounded-lg px-3 py-2.5 overflow-x-auto whitespace-pre-wrap break-all">{@error_detail}</pre>
+                  <pre
+                    class="zaq-text-code leading-relaxed overflow-x-auto whitespace-pre-wrap break-all"
+                    style="color: inherit;"
+                  >{@error_detail}</pre>
                   <button
                     type="button"
                     phx-click="copy_message"
                     phx-value-text={@error_detail}
-                    class="absolute top-1.5 right-1.5 p-1 rounded bg-red-200/60 hover:bg-red-300/60 text-red-500 transition-colors"
+                    class="zaq-chat-message__icon-btn absolute top-1.5 right-1.5"
+                    style="color: inherit;"
                     title="Copy error detail"
                   >
                     <svg
@@ -153,37 +166,43 @@ defmodule ZaqWeb.Components.ChatMessage do
                     </svg>
                   </button>
                 </div>
-              <% end %>
-            <% else %>
-              <%!-- Body — markdown is rendered before display and patched immediately. --%>
-              <div
-                id={@msg_id && "msg-body-#{@msg_id}"}
-                class={[
-                  "text-[0.85rem] leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4",
-                  if(@is_error, do: "text-red-600", else: "zaq-text-ink")
-                ]}
-              >
-                {@rendered_content}
               </div>
             <% end %>
-
-            <%!-- Source cards --%>
+          <% else %>
+            <%!-- Body — markdown is rendered before display and patched immediately. --%>
             <div
-              :if={@sources != []}
-              class="grid grid-cols-2 gap-1.5 mt-3 pt-2.5 zaq-divider-top-soft"
+              id={@msg_id && "msg-body-#{@msg_id}"}
+              class="zaq-text-body leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4"
+              style={
+                if(@is_error,
+                  do: "color: var(--zaq-text-color-body-danger);",
+                  else: "color: var(--zaq-text-color-body-default);"
+                )
+              }
             >
-              <.source_card
-                :for={source <- @sources}
-                source={source}
-                click_event={@source_click_event}
-                click_target={@source_click_target}
-              />
+              {@rendered_content}
             </div>
+          <% end %>
+
+          <%!-- Source references (flat rows) --%>
+          <div
+            :if={@sources != []}
+            class="grid grid-cols-2 gap-1.5 mt-3 pt-2.5"
+            style="border-top: var(--zaq-border-thickness-default) solid var(--zaq-border-color-default);"
+          >
+            <.source_card
+              :for={source <- @sources}
+              source={source}
+              click_event={@source_click_event}
+              click_target={@source_click_target}
+            />
           </div>
 
           <%!-- Meta row: timestamp + confidence bar + actions --%>
           <div class="flex items-center gap-2 mt-1.5 ml-0.5">
-            <span class="text-[0.62rem] zaq-text-muted">{format_time(@timestamp)}</span>
+            <span class="zaq-text-caption" style="color: var(--zaq-text-color-body-tertiary);">
+              {format_time(@timestamp)}
+            </span>
 
             <%!-- Confidence bar --%>
             <div
@@ -191,19 +210,19 @@ defmodule ZaqWeb.Components.ChatMessage do
               class="flex items-center gap-1.5"
               title={"#{trunc(Float.round(@confidence * 100, 0))}% confidence"}
             >
-              <div class="w-16 h-1.5 rounded-full overflow-hidden zaq-confidence-track">
-                <div
-                  class="h-full rounded-full"
-                  style={"width:#{trunc(Float.round(@confidence * 100, 0))}%; background:#{confidence_color(@confidence)};"}
-                />
+              <div
+                class="w-16 h-1.5 rounded-full overflow-hidden box-border"
+                style="background-color: var(--zaq-surface-color-raised); border: var(--zaq-border-thickness-default) solid var(--zaq-border-color-default);"
+              >
+                <div class="h-full rounded-full" style={confidence_bar_fill_style(@confidence)} />
               </div>
-              <span class="text-[0.62rem] zaq-text-muted">
+              <span class="zaq-text-caption" style="color: var(--zaq-text-color-body-tertiary);">
                 {trunc(Float.round(@confidence * 100, 0))}%
               </span>
             </div>
 
             <%!-- Actions slot (copy/feedback in chat, ratings in conversation detail) --%>
-            <div class="flex items-center gap-0.5 msg-actions">
+            <div class="flex items-center gap-0.5">
               {render_slot(@actions)}
             </div>
           </div>
@@ -224,8 +243,8 @@ defmodule ZaqWeb.Components.ChatMessage do
       type="button"
       phx-click={@open_event}
       phx-value-id={@message_id}
-      class="p-1.5 rounded-lg transition-all hover:bg-[#eeece8]"
-      style="color:#b8b5ae;"
+      class="zaq-chat-message__icon-btn"
+      style="color: var(--zaq-icon-color-default);"
       title="Show message information"
       data-testid={"message-info-#{@message_id}"}
     >
@@ -256,8 +275,8 @@ defmodule ZaqWeb.Components.ChatMessage do
       type="button"
       phx-click="copy_message"
       phx-value-text={@text}
-      class={"p-1.5 rounded-lg transition-all hover:bg-[#eeece8] #{String.trim(@class)}"}
-      style="color:#b8b5ae;"
+      class={"zaq-chat-message__icon-btn #{String.trim(@class)}"}
+      style="color: var(--zaq-icon-color-default);"
       title="Copy"
     >
       <svg
@@ -287,11 +306,13 @@ defmodule ZaqWeb.Components.ChatMessage do
       phx-click="feedback"
       phx-value-id={@message_id}
       phx-value-type="positive"
-      class={[
-        "p-1.5 rounded-lg transition-all",
-        if(@feedback == :positive, do: "bg-emerald-50 text-emerald-500", else: "hover:bg-[#eeece8]")
-      ]}
-      style={if @feedback != :positive, do: "color:#b8b5ae;", else: ""}
+      class="zaq-chat-message__icon-btn"
+      style={
+        if @feedback == :positive,
+          do:
+            "background-color: var(--zaq-surface-color-success); color: var(--zaq-text-color-body-success);",
+          else: "color: var(--zaq-icon-color-default);"
+      }
       title="Good response"
     >
       <svg
@@ -321,11 +342,13 @@ defmodule ZaqWeb.Components.ChatMessage do
       phx-click="feedback"
       phx-value-id={@message_id}
       phx-value-type="negative"
-      class={[
-        "p-1.5 rounded-lg transition-all",
-        if(@feedback == :negative, do: "bg-red-50 text-red-400", else: "hover:bg-[#eeece8]")
-      ]}
-      style={if @feedback != :negative, do: "color:#b8b5ae;", else: ""}
+      class="zaq-chat-message__icon-btn"
+      style={
+        if @feedback == :negative,
+          do:
+            "background-color: var(--zaq-surface-color-danger); color: var(--zaq-text-color-body-danger);",
+          else: "color: var(--zaq-icon-color-default);"
+      }
       title="Poor response"
     >
       <svg
@@ -483,10 +506,11 @@ defmodule ZaqWeb.Components.ChatMessage do
       phx-value-path={@preview_path}
       {@click_target_attrs}
       data-testid="source-chip"
-      class="flex items-center gap-2 px-2.5 py-2 rounded-lg border transition-colors min-w-0 zaq-source-card"
+      class="zaq-chat-source-row"
     >
       <svg
-        class="w-3 h-3 flex-shrink-0 zaq-source-card-icon"
+        class="w-3 h-3 flex-shrink-0"
+        style="color: var(--zaq-text-color-body-accent);"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
@@ -498,19 +522,20 @@ defmodule ZaqWeb.Components.ChatMessage do
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <span class="font-mono text-[0.68rem] truncate">{source_label(@source)}</span>
+      <span class="zaq-text-code truncate">{source_label(@source)}</span>
     </button>
 
     <button
       :if={@click_event && is_nil(@preview_path)}
       type="button"
       data-testid="source-chip"
-      class="flex items-center gap-2 px-2.5 py-2 rounded-lg border min-w-0 opacity-60 cursor-not-allowed zaq-source-card"
+      class="zaq-chat-source-row"
       title="Preview unavailable"
       disabled
     >
       <svg
-        class="w-3 h-3 flex-shrink-0 zaq-source-card-icon-muted"
+        class="w-3 h-3 flex-shrink-0"
+        style="color: var(--zaq-text-color-body-tertiary);"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
@@ -522,17 +547,18 @@ defmodule ZaqWeb.Components.ChatMessage do
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <span class="font-mono text-[0.68rem] truncate">{source_label(@source)}</span>
+      <span class="zaq-text-code truncate">{source_label(@source)}</span>
     </button>
 
     <.link
       :if={is_nil(@click_event) && source_preview_path(@source) != "#"}
       navigate={source_preview_path(@source)}
       data-testid="source-chip"
-      class="flex items-center gap-2 px-2.5 py-2 rounded-lg border transition-colors min-w-0 zaq-source-card"
+      class="zaq-chat-source-row"
     >
       <svg
-        class="w-3 h-3 flex-shrink-0 zaq-source-card-icon"
+        class="w-3 h-3 flex-shrink-0"
+        style="color: var(--zaq-text-color-body-accent);"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
@@ -544,18 +570,19 @@ defmodule ZaqWeb.Components.ChatMessage do
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <span class="font-mono text-[0.68rem] truncate">{source_label(@source)}</span>
+      <span class="zaq-text-code truncate">{source_label(@source)}</span>
     </.link>
 
     <button
       :if={is_nil(@click_event) && source_preview_path(@source) == "#"}
       type="button"
       data-testid="source-chip"
-      class="flex items-center gap-2 px-2.5 py-2 rounded-lg border min-w-0 opacity-60 cursor-not-allowed zaq-source-card"
+      class="zaq-chat-source-row"
       disabled
     >
       <svg
-        class="w-3 h-3 flex-shrink-0 zaq-source-card-icon-muted"
+        class="w-3 h-3 flex-shrink-0"
+        style="color: var(--zaq-text-color-body-tertiary);"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
@@ -567,7 +594,7 @@ defmodule ZaqWeb.Components.ChatMessage do
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <span class="font-mono text-[0.68rem] truncate">{source_label(@source)}</span>
+      <span class="zaq-text-code truncate">{source_label(@source)}</span>
     </button>
     """
   end
@@ -629,9 +656,18 @@ defmodule ZaqWeb.Components.ChatMessage do
   defp click_target_attrs(nil), do: %{}
   defp click_target_attrs(target), do: %{"phx-target" => target}
 
-  defp confidence_color(c) when c >= 0.8, do: "#22c55e"
-  defp confidence_color(c) when c >= 0.5, do: "#f59e0b"
-  defp confidence_color(_), do: "#ef4444"
+  defp confidence_bar_fill_style(c) do
+    w = trunc(Float.round(c * 100, 0))
+
+    fill =
+      cond do
+        c >= 0.8 -> "background:var(--zaq-gradient-neon);"
+        c >= 0.5 -> "background-color:var(--zaq-surface-color-elevated);"
+        true -> "background-color:var(--zaq-surface-color-danger-strong);"
+      end
+
+    "width:#{w}%;#{fill}"
+  end
 
   defp humanize_memory_label(label) when is_binary(label) do
     label

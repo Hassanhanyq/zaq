@@ -11,5 +11,8 @@ defmodule Storybook.Chat do
   def entry("feedback_modal"),
     do: [name: "Negative feedback (modal)", index: 20]
 
+  def entry("message_info_popin"),
+    do: [name: "Message info (modal)", index: 21]
+
   def entry(_), do: []
 end

@@ -576,7 +576,7 @@ pre.zaq-file-preview-body {
   transition: width 150ms ease;
 }
 
-/* BO chat — page shell + transcript scrollbar; message slide-in + msg-actions shared with conversation detail / ChatMessage */
+/* BO chat — page shell + transcript scrollbar; message slide-in + message actions shared with conversation detail / ChatMessage */
 @keyframes slide-in-right {
   from {
     opacity: 0;
@@ -609,13 +609,62 @@ pre.zaq-file-preview-body {
   animation: slide-in-left 0.2s ease-out;
 }
 
-.msg-actions {
-  opacity: 0;
-  transition: opacity 0.15s ease;
+/* Tertiary icon controls on chat message rows (copy, message info, feedback idle) */
+.zaq-chat-message__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--zaq-scale-8);
+  border: none;
+  border-radius: var(--zaq-scale-8);
+  background: transparent;
+  color: var(--zaq-icon-color-default);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
-.group:hover .msg-actions {
-  opacity: 1;
+.zaq-chat-message__icon-btn:hover,
+.zaq-chat-message__icon-btn:focus-visible {
+  background-color: var(--zaq-surface-color-elevated);
+}
+
+/* Flat source reference row (replaces chip cards under assistant messages) */
+.zaq-chat-source-row {
+  display: flex;
+  align-items: center;
+  gap: var(--zaq-scale-8);
+  min-width: 0;
+  width: 100%;
+  padding: var(--zaq-scale-4) 0;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: var(--zaq-border-thickness-default) solid var(--zaq-border-color-default);
+  color: var(--zaq-text-color-body-secondary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.zaq-chat-source-row:hover,
+.zaq-chat-source-row:focus-visible {
+  color: var(--zaq-text-color-body-accent);
+}
+
+.zaq-chat-source-row:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+a.zaq-chat-source-row {
+  text-decoration: none;
+}
+
+a.zaq-chat-source-row:hover,
+a.zaq-chat-source-row:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: var(--zaq-scale-4);
 }
 
 #chat-messages::-webkit-scrollbar {

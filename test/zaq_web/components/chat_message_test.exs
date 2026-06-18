@@ -36,7 +36,9 @@ defmodule ZaqWeb.Components.ChatMessageTest do
     refute html =~ "phx-update=\"ignore\""
     assert html =~ "title=\"91% confidence\""
     assert html =~ "width:91%"
-    assert html =~ "background:#22c55e"
+    assert html =~ "var(--zaq-gradient-neon)"
+    assert html =~ "var(--zaq-surface-color-raised)"
+    assert html =~ "solid var(--zaq-border-color-default)"
     assert html =~ "data-testid=\"source-chip\""
     assert html =~ "phx-click=\"open_source_preview\""
     assert html =~ "phx-value-path=\"docs/guide.md\""
@@ -55,13 +57,13 @@ defmodule ZaqWeb.Components.ChatMessageTest do
         sources: []
       )
 
-    assert html =~ "bg-red-50 border-red-200"
-    assert html =~ "text-red-600"
     assert html =~ "Error response"
     refute html =~ "% confidence"
+    assert html =~ "zaq-text-body leading-relaxed"
+    assert html =~ "var(--zaq-text-color-body-danger)"
   end
 
-  test "assistant_bubble uses amber and red confidence colors for mid and low values" do
+  test "assistant_bubble uses elevated fill and danger for mid and low confidence values" do
     mid_html =
       render_component(&ChatMessage.assistant_bubble/1,
         content: "Mid confidence",
@@ -76,8 +78,8 @@ defmodule ZaqWeb.Components.ChatMessageTest do
         confidence: 0.2
       )
 
-    assert mid_html =~ "background:#f59e0b"
-    assert low_html =~ "background:#ef4444"
+    assert mid_html =~ "var(--zaq-surface-color-elevated)"
+    assert low_html =~ "var(--zaq-surface-color-danger-strong)"
   end
 
   test "source chips render disabled states and labels for non-previewable and memory sources" do
@@ -505,10 +507,12 @@ defmodule ZaqWeb.Components.ChatMessageTest do
           sources: []
         )
 
-      assert html =~ "text-red-600 mb-2"
-      assert html =~ "bg-green-50"
+      assert html =~ "var(--zaq-text-color-body-danger)"
+      refute html =~ "bg-green-50"
+      assert html =~ "zaq-btn zaq-btn-primary"
       assert html =~ "https://portal.test"
       assert html =~ "Top up wallet"
+      assert html =~ "var(--zaq-text-color-body-success)"
       refute html =~ "font-mono text-["
     end
 
@@ -521,8 +525,9 @@ defmodule ZaqWeb.Components.ChatMessageTest do
           sources: []
         )
 
-      assert html =~ "text-red-600 mb-2"
-      assert html =~ "font-mono"
+      assert html =~ "zaq-feedback-banner"
+      assert html =~ "zaq-danger"
+      assert html =~ "zaq-text-code"
       assert html =~ "Stack trace detail here"
       assert html =~ ~s(phx-click="copy_message")
       assert html =~ ~s(phx-value-text="Stack trace detail here")
@@ -549,7 +554,8 @@ defmodule ZaqWeb.Components.ChatMessageTest do
           sources: []
         )
 
-      assert html =~ "bg-green-50"
+      refute html =~ "bg-green-50"
+      assert html =~ "zaq-btn zaq-btn-primary"
       assert html =~ "https://portal.test"
     end
 
@@ -562,7 +568,9 @@ defmodule ZaqWeb.Components.ChatMessageTest do
           sources: []
         )
 
-      assert html =~ "font-mono"
+      assert html =~ "zaq-feedback-banner"
+      assert html =~ "zaq-danger"
+      assert html =~ "zaq-text-code"
       refute html =~ "bg-green-50"
     end
 
@@ -576,7 +584,8 @@ defmodule ZaqWeb.Components.ChatMessageTest do
           sources: []
         )
 
-      assert html =~ "bg-green-50"
+      refute html =~ "bg-green-50"
+      assert html =~ "zaq-btn zaq-btn-primary"
       assert html =~ "https://portal.test"
     end
   end

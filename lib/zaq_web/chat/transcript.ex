@@ -51,8 +51,8 @@ defmodule ZaqWeb.Chat.Transcript do
                   <button
                     phx-click="copy_message"
                     phx-value-text={item.body}
-                    class="p-1 rounded transition-all"
-                    style="color: var(--zaq-text-color-body-tertiary);"
+                    class="zaq-chat-message__icon-btn"
+                    style="color: var(--zaq-icon-color-default);"
                     title="Copy"
                   >
                     <svg
