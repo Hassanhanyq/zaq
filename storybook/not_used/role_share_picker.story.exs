@@ -1,8 +1,11 @@
-defmodule Storybook.Components.Pickers.RoleSharePicker do
+defmodule Storybook.NotUsed.RoleSharePicker do
   use PhoenixStorybook.Story, :component
 
   def function, do: &ZaqWeb.Components.RoleSharePicker.role_share_picker/1
-  def description, do: "Multi-select role assignment. When no roles are selected, the resource is private (accessible only to the ingesting user's role)."
+
+  def description,
+    do:
+      "Multi-select role assignment. When no roles are selected, the resource is private (accessible only to the ingesting user's role)."
 
   def variations do
     [

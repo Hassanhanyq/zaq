@@ -1,4 +1,4 @@
-defmodule Storybook.Components.Telemetry.StatusGrid do
+defmodule Storybook.NotUsed.StatusGrid do
   use PhoenixStorybook.Story, :page
 
   alias Zaq.Engine.Telemetry.Contracts.DashboardChart
