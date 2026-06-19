@@ -17,25 +17,34 @@ defmodule ZaqWeb.Components.DesignSystem.DiagnosticCard do
 
   def diagnostic_card(assigns) do
     ~H"""
-    <div class="bg-white rounded-xl border border-black/10 p-5 flex flex-col">
-      <div class="flex items-center justify-between mb-4">
-        <p class="font-mono text-[0.7rem] text-black/40 uppercase tracking-wider">{@label}</p>
+    <div
+      class="zaq-card-default zaq-border-default flex flex-col"
+      style="background-color: var(--zaq-surface-color-raised)"
+    >
+      <div class="flex items-center justify-between">
+        <p
+          class="zaq-text-caption uppercase tracking-wider"
+          style="color: var(--zaq-text-color-body-tertiary)"
+        >
+          {@label}
+        </p>
         <.status_badge :if={@status != nil} status={@status} />
       </div>
-      <div class="space-y-2 mb-4">
+      <div class="space-y-2">
         {render_slot(@inner_block)}
       </div>
-      <div :if={@event} class="mt-auto border-t border-black/5 pt-3">
+      <div :if={@event} class="mt-auto pt-3">
         <button
           phx-click={@event}
           disabled={@status == :loading}
-          class="w-full font-mono text-[0.75rem] font-bold px-4 py-2 rounded-lg bg-[#3c4b64] text-white hover:bg-[#3c4b64]/80 disabled:opacity-40 transition-colors"
+          class="zaq-btn zaq-btn-tertiary zaq-btn-text_label-default w-full zaq-focus-visible"
         >
           {if @status == :loading, do: "Testing…", else: @button_label}
         </button>
         <p
           :if={is_tuple(@status) and elem(@status, 0) == :error}
-          class="font-mono text-[0.7rem] text-red-500 mt-2 break-all"
+          class="zaq-text-caption mt-2 break-all"
+          style="color: var(--zaq-text-color-body-danger)"
         >
           {elem(@status, 1)}
         </p>
