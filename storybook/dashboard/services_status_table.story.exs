@@ -54,8 +54,8 @@ defmodule Storybook.Dashboard.ServicesStatusTable do
     node = :"zaq@127.0.0.1"
 
     Enum.map(service_rows(), fn
-      %{name: "Engine"} = row -> %{row | active: false, node: nil}
-      row -> %{row | active: true, node: node}
+      %{name: "Engine"} = row -> Map.merge(row, %{active: false, node: nil})
+      row -> Map.merge(row, %{active: true, node: node})
     end)
   end
 
