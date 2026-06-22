@@ -80,6 +80,11 @@
     0 0 0 var(--zaq-scale-4) color-mix(in srgb, var(--zaq-border-color-accent) 22%, transparent);
 }
 
+/* Search input inside combobox panel — accent border only, no halo ring */
+.zaq-searchable-select-search-row .zaq-control-text:focus-visible {
+  box-shadow: none;
+}
+
 /* Text-like inputs (<input type="text|search|password|…">) — symmetric insets, no chevron */
 .zaq-control-text {
   padding-inline: var(--zaq-scale-8);
