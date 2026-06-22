@@ -72,7 +72,7 @@
   --zaq-scale-8:    8px;
   --zaq-scale-10:   10px; /*only for small text only in BO*/
   --zaq-scale-12:   12px; /*only small text*/
-  --zaq-scale-14:   14px; /*default texts for BO*/
+  --zaq-scale-14:   14px; /*only on body default texts for BO*/
   --zaq-scale-16:   16px;
   --zaq-scale-20:   20px; /*Bo text style in header*/
   --zaq-scale-24:   24px;
