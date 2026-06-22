@@ -110,7 +110,8 @@
 /* Native <select> — styled native: UA chrome removed so padding + chevron are predictable.
    Chevron uses stroke=currentColor (inherits --zaq-text-color-body-default from `color`). */
 .zaq-control-select {
-  padding-inline-start: var(--zaq-scale-8);
+  min-height: var(--zaq-scale-48);
+  padding-inline-start: var(--zaq-scale-16);
   /* icon (scale-16) + inset from edge (scale-8) + text gap (scale-16) — scale-8/16 only */
   padding-inline-end: calc(var(--zaq-scale-16) + var(--zaq-scale-8) + var(--zaq-scale-16));
   appearance: none;
