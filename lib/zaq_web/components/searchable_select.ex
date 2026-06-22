@@ -111,7 +111,7 @@ defmodule ZaqWeb.Components.SearchableSelect do
             ]}
           />
         </div>
-        <ul data-select-list class="max-h-52 overflow-y-auto py-1">
+        <ul data-select-list class="max-h-52 overflow-y-auto">
           <li
             :for={{label, value} <- @options}
             data-select-option={label}
