@@ -5,7 +5,7 @@ defmodule Storybook.Components.Forms.Input do
 
   def description,
     do:
-      "Labelled form input with validation errors — text-like fields, textarea, and checkbox. For dropdowns see Select and SearchableSelect."
+      "Labelled text-like form input (ZAQ tokens). Text, email, number, etc. — textarea and checkbox are separate variations. Dropdowns: Select / SearchableSelect. Sensitive fields: SecretInput."
 
   def variations do
     [

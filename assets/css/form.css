@@ -85,13 +85,20 @@
   box-shadow: none;
 }
 
-/* Text-like inputs (<input type="text|search|password|…">) — symmetric insets, no chevron */
+/* Text-like inputs (<input type="text|search|password|…">) — field height matches combobox trigger */
 .zaq-control-text {
-  padding-inline: var(--zaq-scale-8);
+  min-height: var(--zaq-scale-48);
+  padding-inline: var(--zaq-scale-16);
 }
 
 .zaq-control-text::placeholder {
   color: var(--zaq-text-color-body-tertiary);
+}
+
+/* Panel filter row — keep dense; do not inherit full field height from .zaq-control-text */
+.zaq-searchable-select-search-row .zaq-control-text {
+  min-height: var(--zaq-scale-32);
+  padding-inline: var(--zaq-scale-8);
 }
 
 /* Denser field (compact searchable select, tight tables) */

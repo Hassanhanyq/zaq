@@ -100,7 +100,7 @@ defmodule ZaqWeb.Components.DesignSystem.Input do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <.input_shell label={@label} errors={@errors}>
+    <.input_shell label={@label} errors={@errors} field_id={@id}>
       <:field>
         <textarea
           id={@id}
@@ -118,17 +118,14 @@ defmodule ZaqWeb.Components.DesignSystem.Input do
 
   def input(assigns) do
     ~H"""
-    <.input_shell label={@label} errors={@errors}>
+    <.input_shell label={@label} errors={@errors} field_id={@id}>
       <:field>
         <input
           type={@type}
           name={@name}
           id={@id}
           value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-          class={[
-            @class || "w-full input",
-            @errors != [] && (@error_class || "input-error")
-          ]}
+          class={text_control_classes(assigns)}
           {@rest}
         />
       </:field>
@@ -138,15 +135,16 @@ defmodule ZaqWeb.Components.DesignSystem.Input do
 
   attr :label, :string, default: nil
   attr :errors, :list, default: []
+  attr :field_id, :any, default: nil
   slot :field, required: true
 
   defp input_shell(assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label>
-        <span :if={@label} class="label mb-1">{@label}</span>
-        {render_slot(@field)}
+    <div class="zaq-field-row-block">
+      <label :if={@label} for={@field_id} class="zaq-field-label-uppercase zaq-text-caption">
+        {@label}
       </label>
+      {render_slot(@field)}
       <.field_error :for={msg <- @errors}>{msg}</.field_error>
     </div>
     """
@@ -156,10 +154,20 @@ defmodule ZaqWeb.Components.DesignSystem.Input do
 
   defp field_error(assigns) do
     ~H"""
-    <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
+    <p
+      class="mt-1.5 flex gap-2 items-center zaq-text-body-sm"
+      style="color: var(--zaq-text-color-body-danger)"
+    >
       <.icon name="hero-exclamation-circle" class="size-5" />
       {render_slot(@inner_block)}
     </p>
     """
+  end
+
+  defp text_control_classes(assigns) do
+    [
+      assigns[:class] || "w-full zaq-control-text",
+      assigns[:errors] != [] && (assigns[:error_class] || "zaq-border-danger")
+    ]
   end
 end

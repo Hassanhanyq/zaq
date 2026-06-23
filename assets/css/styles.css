@@ -31,6 +31,10 @@
   border:var(--zaq-border-color-default) solid var(--zaq-border-thickness-default);
 }
 
+.zaq-border-danger {
+  border:var(--zaq-border-color-danger) solid var(--zaq-border-thickness-default);
+}
+
 /* Keyboard focus ring — add to any interactive control (buttons, links, custom inputs). */
 .zaq-focus-visible:focus-visible {
   outline: var(--zaq-scale-2) solid var(--zaq-border-color-accent);

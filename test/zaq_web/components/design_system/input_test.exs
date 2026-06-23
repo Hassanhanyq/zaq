@@ -26,7 +26,9 @@ defmodule ZaqWeb.Components.DesignSystem.InputTest do
       )
 
     assert text_html =~ "id=\"username\""
-    assert text_html =~ "input-error"
+    assert text_html =~ "zaq-control-text"
+    assert text_html =~ "zaq-border-danger"
+    assert text_html =~ "zaq-field-row-block"
     assert text_html =~ "is invalid"
     assert checkbox_html =~ "type=\"checkbox\""
     assert checkbox_html =~ "Enabled"
