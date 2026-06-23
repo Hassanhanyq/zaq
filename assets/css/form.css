@@ -46,6 +46,14 @@
   letter-spacing: var(--zaq-letter-spacing-relaxed);
 }
 
+/* Form field validation error row — DesignSystem.Checkbox, Input, SecretInput */
+.zaq-field-error {
+  display: flex;
+  align-items: center;
+  gap: var(--zaq-scale-8);
+  margin-top: var(--zaq-scale-8);
+}
+
 /* ── Shared painted shell: native <select>, text inputs, combobox triggers ─── */
 
 .zaq-control-select,
