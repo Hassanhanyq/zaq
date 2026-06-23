@@ -87,4 +87,16 @@ defmodule ZaqWeb.SelectTest do
 
     assert html =~ "max-w-sm"
   end
+
+  test "renders compact trigger class when compact is true" do
+    html =
+      render_component(&Select.select/1,
+        name: "role",
+        compact: true,
+        options: [{"Admin", "admin"}],
+        value: nil
+      )
+
+    assert html =~ "zaq-control-combobox-trigger--compact"
+  end
 end

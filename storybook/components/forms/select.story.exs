@@ -42,6 +42,17 @@ defmodule Storybook.Components.Forms.Select do
               value: nil,
               errors: ["can't be blank"]
             }
+          },
+          %Variation{
+            id: :compact,
+            description: "Compact",
+            attributes: %{
+              name: "role",
+              compact: true,
+              prompt: "Role…",
+              options: [{"Admin", "admin"}, {"Editor", "editor"}, {"Viewer", "viewer"}],
+              value: nil
+            }
           }
         ]
       }

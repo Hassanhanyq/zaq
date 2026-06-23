@@ -14,6 +14,7 @@ defmodule ZaqWeb.Select do
   attr :prompt, :string, default: nil
   attr :errors, :list, default: []
   attr :class, :string, default: nil
+  attr :compact, :boolean, default: false
 
   def select(assigns) do
     ~H"""
@@ -27,6 +28,7 @@ defmodule ZaqWeb.Select do
         options={@options}
         empty_label={@prompt || "Select…"}
         searchable={false}
+        compact={@compact}
       />
       <p :for={msg <- @errors} class="mt-1.5 flex gap-2 items-center text-sm text-error">
         <.icon name="hero-exclamation-circle" class="size-5" />

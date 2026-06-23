@@ -220,8 +220,8 @@ defmodule ZaqWeb.Chat.Composer do
               placeholder="Ask a question… Type @ to filter by source  (Enter ↵ send · Shift+Enter new line)"
               disabled={@status in @busy_statuses}
               class={[
-                "zaq-chat-composer-input zaq-text-body zaq-focus-visible transition-all duration-200",
-                if(@status in @busy_statuses, do: "cursor-not-allowed", else: "")
+                "w-full zaq-control-text",
+                @status in @busy_statuses && "cursor-not-allowed"
               ]}
             ><%= @input_value %></textarea>
           </div>
