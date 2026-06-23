@@ -8,7 +8,7 @@ defmodule Storybook.Dashboard.MetricOverview do
   alias Zaq.Engine.Telemetry.Contracts.Payloads.ScalarPayload
 
   def description,
-    do: "BO Dashboard — KPI grid with `BOTelemetryComponents.metric_card` and sub-metric links."
+    do: "BO Dashboard — KPI grid with `DesignSystem.MetricCard` and sub-metric links."
 
   def render(assigns) do
     metrics = sample_metrics()
