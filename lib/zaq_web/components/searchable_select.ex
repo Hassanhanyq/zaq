@@ -81,7 +81,10 @@ defmodule ZaqWeb.Components.SearchableSelect do
           if(@compact, do: "zaq-control-combobox-trigger--compact")
         ]}
       >
-        <span data-select-label>
+        <span
+          data-select-label
+          class={@compact && "zaq-text-body-sm truncate min-w-0"}
+        >
           {Enum.find_value(@options, @empty_label, fn option ->
             {label, val, _suffix} = normalize_option(option)
             if to_string(val) == to_string(@value || ""), do: label
@@ -117,7 +120,7 @@ defmodule ZaqWeb.Components.SearchableSelect do
             :for={{label, value, suffix} <- Enum.map(@options, &normalize_option/1)}
             data-select-option={label}
             data-select-value={value}
-            class="zaq-dropdown-menu-item zaq-dropdown-menu-item--padded"
+            class="zaq-text-body-sm zaq-dropdown-menu-item zaq-dropdown-menu-item--padded"
           >
             {label}
             <em :if={suffix} class="text-black/35 font-normal">{suffix}</em>
@@ -128,7 +131,7 @@ defmodule ZaqWeb.Components.SearchableSelect do
           type="button"
           data-select-create
           data-create-event={@on_create_event}
-          class="zaq-searchable-select-create hidden"
+          class="zaq-text-body-sm zaq-searchable-select-create hidden"
         >
           <span data-create-label></span>
         </button>

@@ -298,9 +298,12 @@ const liveSocket = new LiveSocket("/live", Socket, {
           const p = panel()
           p.classList.remove('hidden')
           positionPanel()
-          search().value = ''
+          trigger().setAttribute('aria-expanded', 'true')
+          if (search()) {
+            search().value = ''
+            search().focus()
+          }
           filter('')
-          search().focus()
         }
 
         const closePanel = () => {
@@ -311,6 +314,7 @@ const liveSocket = new LiveSocket("/live", Socket, {
           p.style.width = ''
           p.style.left = ''
           p.style.top = ''
+          trigger().setAttribute('aria-expanded', 'false')
         }
 
         this._reposition = () => { if (this._open) positionPanel() }
@@ -321,7 +325,9 @@ const liveSocket = new LiveSocket("/live", Socket, {
           hidden().value = value
           labelEl().textContent = label
           closePanel()
-          hidden().dispatchEvent(new Event('input', { bubbles: true }))
+          const opts = { bubbles: true }
+          hidden().dispatchEvent(new Event('input', opts))
+          hidden().dispatchEvent(new Event('change', opts))
         }
 
         trigger().addEventListener('click', (e) => {
@@ -332,43 +338,45 @@ const liveSocket = new LiveSocket("/live", Socket, {
         this._outsideClick = (e) => { if (!root.contains(e.target)) closePanel() }
         document.addEventListener('click', this._outsideClick, true)
 
-        search().addEventListener('input', (e) => {
-          e.stopPropagation()
-          this._search = search().value
-          const serverSearch = root.dataset.serverSearch
-          if (serverSearch) {
-            clearTimeout(this._searchTimer)
-            this._searchTimer = setTimeout(() => {
-              this.pushEvent(serverSearch, { query: this._search })
-            }, 300)
-          } else {
-            filter(this._search)
-          }
-        })
-        search().addEventListener('change', (e) => { e.stopPropagation() })
+        if (search()) {
+          search().addEventListener('input', (e) => {
+            e.stopPropagation()
+            this._search = search().value
+            const serverSearch = root.dataset.serverSearch
+            if (serverSearch) {
+              clearTimeout(this._searchTimer)
+              this._searchTimer = setTimeout(() => {
+                this.pushEvent(serverSearch, { query: this._search })
+              }, 300)
+            } else {
+              filter(this._search)
+            }
+          })
+          search().addEventListener('change', (e) => { e.stopPropagation() })
+
+          search().addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { e.stopPropagation(); closePanel() }
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              const visible = [...list().querySelectorAll('[data-select-option]')].find(o => o.style.display !== 'none')
+              if (visible) {
+                selectOption(visible.dataset.selectValue, visible.dataset.selectOption)
+              } else {
+                const btn = createBtn()
+                if (btn && !btn.classList.contains('hidden') && this._search.length > 0) {
+                  const name = this._search
+                  closePanel()
+                  const eventName = btn.dataset.createEvent || 'create_and_assign_team'
+                  this.pushEvent(eventName, { name })
+                }
+              }
+            }
+          })
+        }
 
         list().addEventListener('click', (e) => {
           const opt = e.target.closest('[data-select-option]')
           if (opt) selectOption(opt.dataset.selectValue, opt.dataset.selectOption)
-        })
-
-        search().addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') { e.stopPropagation(); closePanel() }
-          if (e.key === 'Enter') {
-            e.preventDefault()
-            const visible = [...list().querySelectorAll('[data-select-option]')].find(o => o.style.display !== 'none')
-            if (visible) {
-              selectOption(visible.dataset.selectValue, visible.dataset.selectOption)
-            } else {
-              const btn = createBtn()
-              if (btn && !btn.classList.contains('hidden') && this._search.length > 0) {
-                const name = this._search
-                closePanel()
-                const eventName = btn.dataset.createEvent || 'create_and_assign_team'
-                this.pushEvent(eventName, { name })
-              }
-            }
-          }
         })
 
         const btn = createBtn()

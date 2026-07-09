@@ -258,9 +258,8 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLiveTest do
     assert html =~ "Default pipeline"
     assert html =~ configured_agent.name
 
-    view
-    |> form("#chat-agent-select-form", %{"agent_id" => to_string(configured_agent.id)})
-    |> render_change()
+    # SearchableSelect uses a JS hook for option picks; fire the change event directly.
+    select_chat_agent(view, configured_agent.id)
 
     view |> element("#chat-form") |> render_submit(%{"message" => "Hello"})
 
@@ -2103,9 +2102,8 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLiveTest do
 
     {:ok, view, _html} = live(conn, ~p"/bo/chat")
 
-    view
-    |> form("#chat-agent-select-form", %{"agent_id" => to_string(configured_agent.id)})
-    |> render_change()
+    # SearchableSelect uses a JS hook for option picks; fire the change event directly.
+    select_chat_agent(view, configured_agent.id)
 
     view |> element("#chat-form") |> render_submit(%{"message" => "Run MCP timeout tool"})
 
@@ -2883,6 +2881,10 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLiveTest do
     refute state.socket.assigns.show_delete_confirm
 
     refute has_element?(view, "#delete-confirm-modal")
+  end
+
+  defp select_chat_agent(view, agent_id) do
+    render_hook(view, "select_agent", %{"agent_id" => to_string(agent_id)})
   end
 
   defp assert_eventually(fun, retries \\ 80)

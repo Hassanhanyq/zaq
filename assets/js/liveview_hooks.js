@@ -241,7 +241,9 @@ export const liveViewHooks = {
         hidden().value = value
         labelEl().textContent = label
         closePanel()
-        hidden().dispatchEvent(new Event("input", { bubbles: true }))
+        const opts = { bubbles: true }
+        hidden().dispatchEvent(new Event("input", opts))
+        hidden().dispatchEvent(new Event("change", opts))
       }
 
       trigger().addEventListener("click", (e) => {

@@ -158,7 +158,8 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLive do
     {:noreply, assign(socket, :input_value, value)}
   end
 
-  def handle_event("select_agent", %{"agent_id" => agent_id}, socket) do
+  def handle_event("select_agent", params, socket) do
+    agent_id = Map.get(params, "agent_id", "")
     {:noreply, assign(socket, :selected_agent_id, agent_id || "")}
   end
 
