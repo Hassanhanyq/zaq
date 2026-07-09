@@ -30,7 +30,6 @@ defmodule ZaqWeb.Components.DesignSystem.StatusPill do
   def status_pill_classes("stale"), do: @pill_base ++ ~w(zaq-pill--warning)
   def status_pill_classes("ingested"), do: @pill_base ++ ~w(zaq-pill--success)
   # Workflow runs and step runs
-  def status_pill_classes("incomplete"), do: @pill_base ++ ~w(zaq-pill--warning)
   def status_pill_classes("running"), do: @pill_base ++ ~w(zaq-pill--accent)
   def status_pill_classes("waiting"), do: @pill_base ++ ~w(zaq-pill--warning)
   def status_pill_classes("paused"), do: @pill_base ++ ~w(zaq-pill--elevated)
