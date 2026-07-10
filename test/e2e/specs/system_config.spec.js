@@ -38,6 +38,7 @@ const SEL = {
   tabImageToText: '[phx-value-tab="image_to_text"]',
   tabAICredentials: '[phx-value-tab="ai_credentials"]',
   tabAuthCredentials: '[phx-value-tab="auth_credentials"]',
+  tabGlobal: '[phx-value-tab="global"]',
 
   llmForm: "#llm-config-form",
   embeddingForm: "#embedding-config-form",
@@ -676,6 +677,50 @@ test.describe("System Config", () => {
       await page.locator('input[name="llm_config[top_p]"]').fill("0.91")
       await page.getByRole("button", { name: "Save LLM Settings" }).click()
       await expect(page.getByText("LLM settings saved.")).toBeVisible()
+    })
+  })
+
+  // ── Global tab ──────────────────────────────────────────────────────────
+
+  test.describe("Global tab", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.locator(SEL.tabGlobal).click()
+      await expect(page).toHaveURL(/tab=global/)
+      await expect(page.getByRole("heading", { name: "Global" })).toBeVisible()
+    })
+
+    test("renders Language and TimeZone fields", async ({ page }) => {
+      await expect(page.locator("#global-language-select")).toBeVisible()
+      await expect(page.locator("#global-timezone-select")).toBeVisible()
+      await expect(page.locator("#global-language-select option[value='en']")).toBeAttached()
+      await expect(page.locator("#global-language-select option[value='fr']")).toBeAttached()
+    })
+
+    test("French language option is disabled", async ({ page }) => {
+      await expect(page.locator("#global-language-select option[value='fr']")).toBeDisabled()
+    })
+
+    test("saves language and persists after page reload", async ({ page }) => {
+      await page.locator("#global-language-select").selectOption("en")
+      await page.locator('form[phx-submit="save_global_language"] button[type="submit"]').click()
+      await expect(page.getByText("Language saved.")).toBeVisible()
+
+      await gotoBackOfficeLive(page, `${CONFIG_PATH}?tab=global`)
+      await expect(page.locator("#global-language-select")).toHaveValue("en")
+    })
+
+    test("shows GMT offsets in timezone dropdown", async ({ page }) => {
+      const options = page.locator("#global-timezone-select option")
+      await expect(options).toContainText(["GMT-12:00", "GMT+00:00", "GMT+14:00"])
+    })
+
+    test("saves timezone and persists after page reload", async ({ page }) => {
+      await page.locator("#global-timezone-select").selectOption("GMT+03:00")
+      await page.locator('form[phx-submit="save_global_timezone"] button[type="submit"]').click()
+      await expect(page.getByText("Timezone saved.")).toBeVisible()
+
+      await gotoBackOfficeLive(page, `${CONFIG_PATH}?tab=global`)
+      await expect(page.locator("#global-timezone-select")).toHaveValue("GMT+03:00")
     })
   })
 })

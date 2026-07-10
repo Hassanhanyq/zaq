@@ -14,8 +14,10 @@ defmodule ZaqWeb.Live.BO.System.PeopleLive do
   alias ZaqWeb.Components.DesignSystem.EmptyState
   alias ZaqWeb.Components.DesignSystem.SimplePagination
   alias ZaqWeb.Components.DesignSystem.Toggle, as: DSToggle
+  alias ZaqWeb.Helpers.Timezone
   alias ZaqWeb.Live.BO.System.PeopleTable
   alias ZaqWeb.Live.BO.System.TeamsTable
+
 
   def mount(_params, _session, socket) do
     socket =
@@ -1134,7 +1136,9 @@ defmodule ZaqWeb.Live.BO.System.PeopleLive do
                   :if={channel.last_interaction_at}
                   class="font-mono text-[0.62rem] text-black/30 mt-0.5"
                 >
-                  last seen {Calendar.strftime(channel.last_interaction_at, "%Y-%m-%d %H:%M")}
+                  last seen {channel.last_interaction_at
+                  |> Timezone.shift()
+                  |> Calendar.strftime("%Y-%m-%d %H:%M")}
                 </p>
               </div>
               <span

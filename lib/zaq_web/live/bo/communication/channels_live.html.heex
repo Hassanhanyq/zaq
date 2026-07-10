@@ -982,6 +982,7 @@
                             ts
                             |> div(1000)
                             |> DateTime.from_unix!()
+                            |> Timezone.shift()
                             |> Calendar.strftime("%b %d, %H:%M"),
                           else: ""
                       end)}
@@ -1040,6 +1041,7 @@
                                   ts
                                   |> div(1000)
                                   |> DateTime.from_unix!()
+                                  |> Timezone.shift()
                                   |> Calendar.strftime("%b %d, %H:%M"),
                                 else: ""
                             end)}

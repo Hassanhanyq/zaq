@@ -351,7 +351,8 @@ defmodule ZaqWeb.Live.BO.AI.WorkflowRunLive do
             <div class="flex items-center gap-3 mt-2">
               <.run_status_badge status={@run.status} />
               <span class="font-mono text-[0.75rem] text-black/60">
-                Started {format_dt(@run.started_at)} · <.run_duration run={@run} now={@now} />
+                Started {format_datetime_seconds(@run.started_at)} ·
+                <.run_duration run={@run} now={@now} />
               </span>
             </div>
           </div>
@@ -862,7 +863,4 @@ defmodule ZaqWeb.Live.BO.AI.WorkflowRunLive do
 
   defp short_id(nil), do: "?"
   defp short_id(id), do: String.slice(id, 0, 8)
-
-  defp format_dt(nil), do: "—"
-  defp format_dt(%DateTime{} = dt), do: Calendar.strftime(dt, "%Y-%m-%d %H:%M:%S")
 end

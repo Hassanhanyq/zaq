@@ -10,7 +10,10 @@ defmodule ZaqWeb.Live.BO.System.SystemConfig.GlobalTabTest do
       render_component(&GlobalTab.panel/1,
         global_agent_options: [],
         global_default_agent_id: nil,
-        global_base_url: ""
+        global_base_url: "",
+        global_language: "en",
+        global_timezone: nil,
+        detected_timezone: nil
       )
 
     assert html =~ "Global"
@@ -29,7 +32,10 @@ defmodule ZaqWeb.Live.BO.System.SystemConfig.GlobalTabTest do
       render_component(&GlobalTab.panel/1,
         global_agent_options: [{"Answering", 1}, {"Escalation", 2}],
         global_default_agent_id: 2,
-        global_base_url: "https://zaq.example"
+        global_base_url: "https://zaq.example",
+        global_language: "en",
+        global_timezone: nil,
+        detected_timezone: nil
       )
 
     assert html =~ "Answering"

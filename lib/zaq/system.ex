@@ -35,7 +35,8 @@ defmodule Zaq.System do
   @image_to_text_write_fields ~w(credential_id model)
   @global_default_agent_key "channels.global_default_agent_id"
   @global_base_url_key "system.global.base_url"
-
+  @system_language_key "system.global.language"
+  @system_timezone_key "system.global.timezone"
   # ── Generic key/value ─────────────────────────────────────────────────
 
   @doc "Returns the stored value for `key`, or `nil`."
@@ -93,6 +94,42 @@ defmodule Zaq.System do
     value = if is_binary(base_url), do: String.trim(base_url), else: ""
 
     case set_config(@global_base_url_key, value) do
+      {:ok, _} -> :ok
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc "Returns the configured system language, or \"en\" by default."
+  @spec get_system_language() :: String.t()
+  def get_system_language do
+    get_config(@system_language_key) || "en"
+  end
+
+  @doc "Sets the system language."
+  @spec set_system_language(String.t()) :: :ok | {:error, term()}
+  def set_system_language(language) do
+    case set_config(@system_language_key, language) do
+      {:ok, _} -> :ok
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc "Returns the configured system timezone, or nil by default."
+  @spec get_system_timezone() :: String.t() | nil
+  def get_system_timezone do
+    case get_config(@system_timezone_key) do
+      nil -> nil
+      "" -> nil
+      value -> value
+    end
+  end
+
+  @doc "Sets the system timezone."
+  @spec set_system_timezone(String.t() | nil) :: :ok | {:error, term()}
+  def set_system_timezone(timezone) do
+    value = if is_binary(timezone), do: String.trim(timezone), else: ""
+
+    case set_config(@system_timezone_key, value) do
       {:ok, _} -> :ok
       {:error, reason} -> {:error, reason}
     end

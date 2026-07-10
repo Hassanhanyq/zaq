@@ -382,7 +382,7 @@ defmodule ZaqWeb.Live.BO.AI.WorkflowDetailLive do
                   Last Run
                 </p>
                 <p class="font-mono text-[0.75rem] text-black/70">
-                  {if last_run, do: format_dt(last_run.started_at), else: "—"}
+                  {if last_run, do: format_datetime_seconds(last_run.started_at), else: "—"}
                 </p>
               </div>
               <%!-- ID --%>
@@ -494,7 +494,7 @@ defmodule ZaqWeb.Live.BO.AI.WorkflowDetailLive do
                     <.run_status_badge status={run.status} />
                   </td>
                   <td class="px-5 py-3 font-mono text-[0.82rem] text-black">
-                    {format_dt(run.started_at)}
+                    {format_datetime_seconds(run.started_at)}
                   </td>
                   <td class="px-5 py-3">
                     <.run_duration run={run} />
@@ -680,12 +680,6 @@ defmodule ZaqWeb.Live.BO.AI.WorkflowDetailLive do
   end
 
   defp node_router, do: Application.get_env(:zaq, :node_router, Zaq.NodeRouter)
-
-  defp format_dt(nil), do: "—"
-
-  defp format_dt(%DateTime{} = dt) do
-    Calendar.strftime(dt, "%Y-%m-%d %H:%M:%S")
-  end
 
   # Returns the Unix timestamp (seconds) when the cron schedule next fires.
   # Used as `data-next-at` for the JS CronCountdown hook. Falls back to nil.

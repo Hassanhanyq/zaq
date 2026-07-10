@@ -3,11 +3,21 @@ defmodule ZaqWeb.Live.BO.System.SystemConfig.GlobalTab do
   Tab component for the BO system configuration page.
   """
   use ZaqWeb, :html
+
   attr :global_agent_options, :list, required: true
   attr :global_default_agent_id, :any, required: true
   attr :global_base_url, :string, required: true
+  attr :global_language, :string, required: true
+  attr :global_timezone, :any, required: true
+  attr :detected_timezone, :any, default: nil
+
+  @gmt_offsets for h <- -12..14,
+                   do:
+                     "GMT#{if h >= 0, do: "+", else: ""}#{String.pad_leading(to_string(h), 2, "0")}:00"
 
   def panel(assigns) do
+    assigns = assign(assigns, :gmt_offsets, @gmt_offsets)
+
     ~H"""
     <div class="bg-white rounded-2xl border border-black/[0.06] shadow-sm overflow-hidden">
       <div class="px-8 py-5 border-b border-black/[0.06] bg-[#fafafa]">
@@ -42,33 +52,100 @@ defmodule ZaqWeb.Live.BO.System.SystemConfig.GlobalTab do
           </p>
         </div>
 
-        <label class="font-mono text-[0.68rem] font-semibold text-black/60 uppercase tracking-wider block mb-2">
-          Global Default Agent
-        </label>
-        <form phx-submit="save_global_default_agent" class="flex items-center gap-2">
-          <select
-            id="global-default-agent-select"
-            name="global_default_agent_id"
-            class="w-full max-w-md font-mono text-[0.82rem] text-black border border-black/10 rounded-xl h-10 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#03b6d4]/20 focus:border-[#03b6d4]"
-          >
-            <option value="" selected={is_nil(@global_default_agent_id)}>
-              Default Zaq Agent
-            </option>
-            <option
-              :for={{name, id} <- @global_agent_options}
-              value={id}
-              selected={to_string(@global_default_agent_id || "") == to_string(id)}
+        <div>
+          <label class="font-mono text-[0.68rem] font-semibold text-black/60 uppercase tracking-wider block mb-2">
+            Global Default Agent
+          </label>
+          <form phx-submit="save_global_default_agent" class="flex items-center gap-2">
+            <select
+              id="global-default-agent-select"
+              name="global_default_agent_id"
+              class="w-full max-w-md font-mono text-[0.82rem] text-black border border-black/10 rounded-xl h-10 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#03b6d4]/20 focus:border-[#03b6d4]"
             >
-              {name}
-            </option>
-          </select>
-          <button
-            type="submit"
-            class="font-mono text-[0.72rem] px-3 py-2 rounded-lg border border-black/10 text-black/60 hover:text-black hover:border-black/20"
+              <option value="" selected={is_nil(@global_default_agent_id)}>
+                Default Zaq Agent
+              </option>
+              <option
+                :for={{name, id} <- @global_agent_options}
+                value={id}
+                selected={to_string(@global_default_agent_id || "") == to_string(id)}
+              >
+                {name}
+              </option>
+            </select>
+            <button
+              type="submit"
+              class="font-mono text-[0.72rem] px-3 py-2 rounded-lg border border-black/10 text-black/60 hover:text-black hover:border-black/20"
+            >
+              Save
+            </button>
+          </form>
+        </div>
+
+        <div>
+          <label class="font-mono text-[0.68rem] font-semibold text-black/60 uppercase tracking-wider block mb-2">
+            Language
+          </label>
+          <form phx-submit="save_global_language" class="flex items-center gap-2">
+            <select
+              id="global-language-select"
+              name="language"
+              class="w-full max-w-md font-mono text-[0.82rem] text-black border border-black/10 rounded-xl h-10 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#03b6d4]/20 focus:border-[#03b6d4]"
+            >
+              <option value="en" selected={@global_language == "en"}>English</option>
+              <option value="fr" disabled selected={@global_language == "fr"}>French</option>
+            </select>
+            <button
+              type="submit"
+              class="font-mono text-[0.72rem] px-3 py-2 rounded-lg border border-black/10 text-black/60 hover:text-black hover:border-black/20"
+            >
+              Save
+            </button>
+          </form>
+          <p class="font-mono text-[0.68rem] text-black/45 mt-2">
+            System language for UI labels and notifications. French is not yet implemented.
+          </p>
+        </div>
+
+        <div id="global-timezone-section" phx-hook="DetectTimezone">
+          <label class="font-mono text-[0.68rem] font-semibold text-black/60 uppercase tracking-wider block mb-2">
+            TimeZone
+          </label>
+          <form phx-submit="save_global_timezone" class="flex items-center gap-2">
+            <select
+              id="global-timezone-select"
+              name="timezone"
+              class="w-full max-w-md font-mono text-[0.82rem] text-black border border-black/10 rounded-xl h-10 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#03b6d4]/20 focus:border-[#03b6d4]"
+            >
+              <option value="">—</option>
+              <option
+                :for={gmt <- @gmt_offsets}
+                value={gmt}
+                selected={
+                  (@global_timezone && @global_timezone == gmt) ||
+                    (is_nil(@global_timezone) && @detected_timezone == gmt)
+                }
+              >
+                {gmt}
+              </option>
+            </select>
+            <button
+              type="submit"
+              class="font-mono text-[0.72rem] px-3 py-2 rounded-lg border border-black/10 text-black/60 hover:text-black hover:border-black/20"
+            >
+              Save
+            </button>
+          </form>
+          <p
+            :if={@detected_timezone && is_nil(@global_timezone)}
+            class="font-mono text-[0.68rem] text-[#03b6d4] mt-2"
           >
-            Save
-          </button>
-        </form>
+            Detected: {@detected_timezone}
+          </p>
+          <p :if={@global_timezone} class="font-mono text-[0.68rem] text-black/45 mt-2">
+            Display timezone for message timestamps and workflow run times.
+          </p>
+        </div>
       </div>
     </div>
     """

@@ -11,6 +11,8 @@ defmodule ZaqWeb.Helpers.DateFormat do
   ISO-8601 binary strings (as stored in license payloads).
   """
 
+  alias ZaqWeb.Helpers.Timezone
+
   @doc "Formats a DateTime or NaiveDateTime as a short date string."
   def format_date(nil), do: "—"
 
@@ -23,13 +25,44 @@ defmodule ZaqWeb.Helpers.DateFormat do
 
   def format_date(dt), do: Calendar.strftime(dt, "%B %d, %Y")
 
-  @doc "Formats a DateTime or NaiveDateTime as a date-time string."
+  @doc "Formats a DateTime or NaiveDateTime as a date-time string, converted to system timezone."
   def format_datetime(nil), do: "—"
-  def format_datetime(dt), do: Calendar.strftime(dt, "%Y-%m-%d %H:%M")
 
-  @doc "Formats a DateTime or NaiveDateTime as a time-only string."
+  def format_datetime(%DateTime{} = dt) do
+    dt
+    |> Timezone.shift()
+    |> Calendar.strftime("%Y-%m-%d %H:%M")
+  end
+
+  def format_datetime(%NaiveDateTime{} = ndt) do
+    Calendar.strftime(ndt, "%Y-%m-%d %H:%M")
+  end
+
+  @doc "Formats a DateTime or NaiveDateTime as a date-time string with seconds, converted to system timezone."
+  def format_datetime_seconds(nil), do: "—"
+
+  def format_datetime_seconds(%DateTime{} = dt) do
+    dt
+    |> Timezone.shift()
+    |> Calendar.strftime("%Y-%m-%d %H:%M:%S")
+  end
+
+  def format_datetime_seconds(%NaiveDateTime{} = ndt) do
+    Calendar.strftime(ndt, "%Y-%m-%d %H:%M:%S")
+  end
+
+  @doc "Formats a DateTime or NaiveDateTime as a time-only string, converted to system timezone."
   def format_time(nil), do: "—"
-  def format_time(dt), do: Calendar.strftime(dt, "%H:%M")
+
+  def format_time(%DateTime{} = dt) do
+    dt
+    |> Timezone.shift()
+    |> Calendar.strftime("%H:%M")
+  end
+
+  def format_time(%NaiveDateTime{} = ndt) do
+    Calendar.strftime(ndt, "%H:%M")
+  end
 
   @doc """
   Injects `%{type: :date_separator, date: Date.t()}` entries before the first

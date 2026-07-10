@@ -44,6 +44,34 @@ defmodule ZaqWeb.Helpers.DateFormatTest do
     end
   end
 
+  describe "timezone shift" do
+    test "format_datetime with no timezone returns UTC unchanged" do
+      dt = ~U[2026-03-13 14:05:00Z]
+      assert DateFormat.format_datetime(dt) == "2026-03-13 14:05"
+    end
+
+    test "format_time with no timezone returns UTC unchanged" do
+      dt = ~U[2026-03-13 14:05:00Z]
+      assert DateFormat.format_time(dt) == "14:05"
+    end
+
+    test "format_time shifts by configured GMT+ timezone" do
+      Application.put_env(:zaq, :system_timezone_fun, fn -> "GMT+03:00" end)
+      on_exit(fn -> Application.put_env(:zaq, :system_timezone_fun, fn -> nil end) end)
+
+      dt = ~U[2026-03-13 14:05:00Z]
+      assert DateFormat.format_time(dt) == "17:05"
+    end
+
+    test "format_datetime shifts by configured GMT- timezone" do
+      Application.put_env(:zaq, :system_timezone_fun, fn -> "GMT-05:00" end)
+      on_exit(fn -> Application.put_env(:zaq, :system_timezone_fun, fn -> nil end) end)
+
+      dt = ~U[2026-03-13 14:05:00Z]
+      assert DateFormat.format_datetime(dt) == "2026-03-13 09:05"
+    end
+  end
+
   describe "inject_date_separators/2" do
     test "empty list returns empty list" do
       assert DateFormat.inject_date_separators([]) == []

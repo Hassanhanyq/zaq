@@ -762,6 +762,39 @@ defmodule ZaqWeb.Live.BO.Communication.ChannelsLiveTest do
     assert state.socket.assigns.posts == []
   end
 
+  test "post timestamps are shifted by configured timezone", %{conn: conn} do
+    insert_channel_config(%{url: "https://mattermost.test"})
+
+    HTTPClientFake.put_response({
+      :ok,
+      %Req.Response{
+        status: 200,
+        body:
+          Jason.encode!(%{
+            "order" => ["p1"],
+            "posts" => %{
+              "p1" => %{
+                "id" => "p1",
+                "message" => "tz-check",
+                "user_id" => "u1",
+                "create_at" => 3_600_000
+              }
+            }
+          })
+      }
+    })
+
+    Application.put_env(:zaq, :system_timezone_fun, fn -> "GMT+03:00" end)
+    on_exit(fn -> Application.put_env(:zaq, :system_timezone_fun, fn -> nil end) end)
+
+    {:ok, view, _html} = live(conn, ~p"/bo/channels/retrieval/mattermost")
+    view |> element("form[phx-submit='load_posts']") |> render_submit(%{"channel_id" => "ch-1"})
+
+    html = render(view)
+    assert html =~ "tz-check"
+    assert html =~ "04:00"
+  end
+
   test "save shows token encryption error when encryption key is invalid", %{conn: conn} do
     previous_secret_config = Application.get_env(:zaq, Zaq.System.SecretConfig, [])
 

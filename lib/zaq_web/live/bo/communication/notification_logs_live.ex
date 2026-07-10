@@ -13,6 +13,7 @@ defmodule ZaqWeb.Live.BO.Communication.NotificationLogsLive do
 
   alias Zaq.Engine.Notifications.NotificationLog
   alias Zaq.Repo
+  alias ZaqWeb.Helpers.Timezone
 
   @per_page 20
 

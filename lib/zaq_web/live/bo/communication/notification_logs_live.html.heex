@@ -121,7 +121,7 @@
                 </span>
               </td>
               <td class="font-mono text-[0.7rem] text-black/40 px-4 py-3">
-                {Calendar.strftime(log.inserted_at, "%Y-%m-%d %H:%M")}
+                {log.inserted_at |> Timezone.shift() |> Calendar.strftime("%Y-%m-%d %H:%M")}
               </td>
               <td class="px-4 py-3 text-right">
                 <button
@@ -197,10 +197,9 @@
             <div>
               <h2 class="font-mono text-[0.95rem] font-bold text-black">Notification Details</h2>
               <p class="font-mono text-[0.7rem] text-black/40 mt-0.5">
-                Log #{@selected_log.id} · {Calendar.strftime(
-                  @selected_log.inserted_at,
-                  "%Y-%m-%d %H:%M"
-                )}
+                Log #{@selected_log.id} · {@selected_log.inserted_at
+                |> Timezone.shift()
+                |> Calendar.strftime("%Y-%m-%d %H:%M")}
               </p>
             </div>
             <button

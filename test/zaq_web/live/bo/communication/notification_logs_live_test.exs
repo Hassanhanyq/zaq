@@ -354,6 +354,28 @@ defmodule ZaqWeb.Live.BO.Communication.NotificationLogsLiveTest do
     end
   end
 
+  describe "timezone rendering" do
+    test "log timestamps are shifted by configured timezone", %{conn: conn} do
+      conn = authed_conn(conn)
+
+      {:ok, log} =
+        NotificationLog.create_log(%{sender: "tz_check", payload: %{"t" => "z"}})
+
+      known = ~U[2026-06-15 12:00:00Z]
+
+      log
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_change(:inserted_at, known)
+      |> Repo.update!()
+
+      Application.put_env(:zaq, :system_timezone_fun, fn -> "GMT+03:00" end)
+      on_exit(fn -> Application.put_env(:zaq, :system_timezone_fun, fn -> nil end) end)
+
+      {:ok, _view, html} = live(conn, ~p"/bo/channels/notifications/logs")
+      assert html =~ "15:00"
+    end
+  end
+
   describe "status rendering" do
     test "renders sent failed skipped and pending statuses", %{conn: conn} do
       {:ok, sent} =

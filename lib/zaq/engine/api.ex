@@ -253,6 +253,26 @@ defmodule Zaq.Engine.Api do
     end
   end
 
+  def handle_event(%Event{} = event, :system_config_get_system_language, _context),
+    do: %{event | response: System.get_system_language()}
+
+  def handle_event(%Event{} = event, :system_config_set_system_language, _context) do
+    case event.request do
+      %{language: language} -> %{event | response: System.set_system_language(language)}
+      other -> %{event | response: {:error, {:invalid_request, other}}}
+    end
+  end
+
+  def handle_event(%Event{} = event, :system_config_get_system_timezone, _context),
+    do: %{event | response: System.get_system_timezone()}
+
+  def handle_event(%Event{} = event, :system_config_set_system_timezone, _context) do
+    case event.request do
+      %{timezone: timezone} -> %{event | response: System.set_system_timezone(timezone)}
+      other -> %{event | response: {:error, {:invalid_request, other}}}
+    end
+  end
+
   def handle_event(%Event{} = event, :system_config_get_llm_config, _context),
     do: %{event | response: System.get_llm_config()}
 

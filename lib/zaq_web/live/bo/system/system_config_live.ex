@@ -12,6 +12,7 @@ defmodule ZaqWeb.Live.BO.System.SystemConfigLive do
   alias Zaq.System.TelemetryConfig
   alias Zaq.Utils.Map, as: MapUtils
   alias Zaq.Utils.ParseUtils
+  alias ZaqWeb.Helpers.Timezone
   alias ZaqWeb.Live.BO.Communication.OAuthPopupUI
   alias ZaqWeb.Live.BO.System.SystemConfig.AICredentialEvents
   alias ZaqWeb.Live.BO.System.SystemConfig.ConnectCredentialEvents
@@ -56,6 +57,9 @@ defmodule ZaqWeb.Live.BO.System.SystemConfigLive do
      |> assign(:global_agent_options, global_agent_options())
      |> assign(:global_default_agent_id, engine_get_global_default_agent_id())
      |> assign(:global_base_url, engine_get_global_base_url() || "")
+     |> assign(:global_language, engine_get_system_language())
+     |> assign(:global_timezone, engine_get_system_timezone())
+     |> assign(:detected_timezone, nil)
      |> assign(:ai_provider_options, provider_options(fn _ -> true end))
      |> assign(:connect_grants_modal, false)
      |> assign(:connect_credential_modal, false)
@@ -299,6 +303,53 @@ defmodule ZaqWeb.Live.BO.System.SystemConfigLive do
       {:error, reason} ->
         {:noreply,
          put_flash(socket, :error, "Failed to save global base URL: #{inspect(reason)}")}
+    end
+  end
+
+  def handle_event("detect_timezone", %{"offset" => offset}, socket) do
+    gmt = Timezone.offset_to_gmt_string(offset)
+
+    socket =
+      if is_nil(socket.assigns.global_timezone) do
+        case engine_set_system_timezone(gmt) do
+          :ok ->
+            socket
+            |> GlobalEvents.apply_timezone_saved(engine_get_system_timezone())
+            |> assign(:detected_timezone, gmt)
+
+          _ ->
+            assign(socket, :detected_timezone, gmt)
+        end
+      else
+        assign(socket, :detected_timezone, gmt)
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("save_global_language", %{"language" => language}, socket) do
+    case engine_set_system_language(language) do
+      :ok ->
+        {:noreply,
+         socket
+         |> GlobalEvents.apply_language_saved(engine_get_system_language())
+         |> put_flash(:info, "Language saved.")}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to save language: #{inspect(reason)}")}
+    end
+  end
+
+  def handle_event("save_global_timezone", %{"timezone" => timezone}, socket) do
+    case engine_set_system_timezone(timezone) do
+      :ok ->
+        {:noreply,
+         socket
+         |> GlobalEvents.apply_timezone_saved(engine_get_system_timezone())
+         |> put_flash(:info, "Timezone saved.")}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to save timezone: #{inspect(reason)}")}
     end
   end
 
@@ -1339,6 +1390,18 @@ defmodule ZaqWeb.Live.BO.System.SystemConfigLive do
 
   defp engine_set_global_base_url(base_url),
     do: dispatch_engine(:system_config_set_global_base_url, %{base_url: base_url})
+
+  defp engine_get_system_language,
+    do: dispatch_engine(:system_config_get_system_language)
+
+  defp engine_set_system_language(language),
+    do: dispatch_engine(:system_config_set_system_language, %{language: language})
+
+  defp engine_get_system_timezone,
+    do: dispatch_engine(:system_config_get_system_timezone)
+
+  defp engine_set_system_timezone(timezone),
+    do: dispatch_engine(:system_config_set_system_timezone, %{timezone: timezone})
 
   defp engine_get_telemetry_config, do: dispatch_engine(:system_config_get_telemetry_config)
 

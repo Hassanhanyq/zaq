@@ -1154,6 +1154,32 @@ defmodule ZaqWeb.Live.BO.System.PeopleLiveTest do
     assert html =~ "keep#{ts}@example.com"
   end
 
+  # ── timezone rendering ────────────────────────────────────────────────────
+
+  test "channel last_interaction_at timestamps are shifted by configured timezone", %{conn: conn} do
+    person = person_fixture()
+    known = ~U[2026-06-15 12:00:00Z]
+
+    channel_fixture(person, %{
+      "platform" => "slack",
+      "channel_identifier" => "@tz-check",
+      "last_interaction_at" => known
+    })
+
+    Application.put_env(:zaq, :system_timezone_fun, fn -> "GMT+03:00" end)
+    on_exit(fn -> Application.put_env(:zaq, :system_timezone_fun, fn -> nil end) end)
+
+    {:ok, view, _html} = live(conn, ~p"/bo/people")
+
+    view
+    |> element("[phx-click='select_person'][phx-value-id='#{person.id}']")
+    |> render_click()
+
+    html = render(view)
+    assert html =~ "last seen"
+    assert html =~ "15:00"
+  end
+
   # ── switch_tab resets selected person ────────────────────────────────────
 
   test "switching to People tab after Teams clears selected state", %{conn: conn} do

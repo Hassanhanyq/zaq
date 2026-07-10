@@ -104,6 +104,40 @@ defmodule Zaq.SystemTest do
     end
   end
 
+  describe "system language/timezone config" do
+    test "get_system_language/0 defaults to en" do
+      assert System.get_system_language() == "en"
+    end
+
+    test "set_system_language/1 persists and reads back" do
+      assert :ok = System.set_system_language("fr")
+      assert System.get_system_language() == "fr"
+
+      assert :ok = System.set_system_language("en")
+      assert System.get_system_language() == "en"
+    end
+
+    test "get_system_timezone/0 returns nil when unset" do
+      assert System.get_system_timezone() == nil
+    end
+
+    test "set_system_timezone/1 persists and clears the value" do
+      assert :ok = System.set_system_timezone("GMT+03:00")
+      assert System.get_system_timezone() == "GMT+03:00"
+
+      assert :ok = System.set_system_timezone(nil)
+      assert System.get_system_timezone() == nil
+    end
+
+    test "set_system_timezone/1 trims whitespace to empty" do
+      assert :ok = System.set_system_timezone("   GMT+02:00   ")
+      assert System.get_system_timezone() == "GMT+02:00"
+
+      assert :ok = System.set_system_timezone("   ")
+      assert System.get_system_timezone() == nil
+    end
+  end
+
   # ── LLM ───────────────────────────────────────────────────────────────
 
   describe "get_llm_config/0" do

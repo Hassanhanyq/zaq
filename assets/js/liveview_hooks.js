@@ -138,6 +138,12 @@ export const liveViewHooks = {
       this.el.scrollTop = this.el.scrollHeight
     }
   },
+  DetectTimezone: {
+    mounted() {
+      const offsetMinutes = new Date().getTimezoneOffset()
+      this.pushEvent("detect_timezone", { offset: offsetMinutes })
+    }
+  },
   FocusInput: {
     mounted() {
       this.el.focus()

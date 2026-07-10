@@ -2778,6 +2778,34 @@ defmodule ZaqWeb.Live.BO.System.SystemConfigLiveTest do
     end
   end
 
+  describe "global language saving" do
+    test "saves configured language", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/bo/system-config?tab=global")
+
+      html =
+        render_submit(view, "save_global_language", %{
+          "language" => "en"
+        })
+
+      assert html =~ "Language saved."
+      assert Zaq.System.get_system_language() == "en"
+    end
+  end
+
+  describe "global timezone saving" do
+    test "saves configured timezone", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/bo/system-config?tab=global")
+
+      html =
+        render_submit(view, "save_global_timezone", %{
+          "timezone" => "GMT+03:00"
+        })
+
+      assert html =~ "Timezone saved."
+      assert Zaq.System.get_system_timezone() == "GMT+03:00"
+    end
+  end
+
   describe "MCP test endpoint failure mapping" do
     test "shows generic fallback message for unexpected MCP error", %{conn: conn} do
       prev = Application.get_env(:zaq, :mcp_test_module)
@@ -4832,6 +4860,48 @@ defmodule ZaqWeb.Live.BO.System.SystemConfigLiveTest do
         })
 
       assert html =~ "Failed to save global base URL"
+    end
+
+    test "save_global_language error shows failure flash", %{conn: conn} do
+      stub_fn = fn %Zaq.Event{} = event ->
+        if event.opts[:action] == :system_config_set_system_language do
+          %Zaq.Event{event | response: {:error, :boom}}
+        else
+          build_stub_response(event)
+        end
+      end
+
+      Mox.stub(Zaq.NodeRouterMock, :dispatch, stub_fn)
+
+      {:ok, view, _html} = live(conn, ~p"/bo/system-config?tab=global")
+
+      html =
+        render_submit(view, "save_global_language", %{
+          "language" => "fr"
+        })
+
+      assert html =~ "Failed to save language"
+    end
+
+    test "save_global_timezone error shows failure flash", %{conn: conn} do
+      stub_fn = fn %Zaq.Event{} = event ->
+        if event.opts[:action] == :system_config_set_system_timezone do
+          %Zaq.Event{event | response: {:error, :boom}}
+        else
+          build_stub_response(event)
+        end
+      end
+
+      Mox.stub(Zaq.NodeRouterMock, :dispatch, stub_fn)
+
+      {:ok, view, _html} = live(conn, ~p"/bo/system-config?tab=global")
+
+      html =
+        render_submit(view, "save_global_timezone", %{
+          "timezone" => "GMT+03:00"
+        })
+
+      assert html =~ "Failed to save timezone"
     end
   end
 
