@@ -4,9 +4,13 @@ defmodule ZaqWeb.Components.DesignSystem.SimplePagination do
 
   Used on `/bo/people` and similar paginated master lists. Prev/Next buttons render
   only when another page exists in that direction.
+
+  Styles: `assets/css/table.css` (`.zaq-simple-pagination` shell).
   """
 
   use Phoenix.Component
+
+  import ZaqWeb.Components.DesignSystem.Button
 
   attr :page, :integer, required: true
   attr :per_page, :integer, required: true
@@ -15,32 +19,31 @@ defmodule ZaqWeb.Components.DesignSystem.SimplePagination do
 
   def simple_pagination(assigns) do
     ~H"""
-    <div
-      :if={@total_count > 0}
-      class="px-5 py-3 border-t border-black/6 flex items-center justify-between"
-    >
-      <span class="font-mono text-[0.68rem] text-black/40">
+    <div :if={@total_count > 0} class="zaq-simple-pagination">
+      <span
+        class="zaq-text-caption"
+        style="color: var(--zaq-text-color-body-tertiary)"
+        data-testid="simple-pagination-range"
+      >
         {@page * @per_page - @per_page + 1}–{min(@page * @per_page, @total_count)} of {@total_count}
       </span>
-      <div class="flex gap-1">
-        <button
+      <div class="zaq-layout-inline-compact">
+        <.button
           :if={@page > 1}
-          type="button"
+          variant={:ghost}
           phx-click={@change_event}
           phx-value-page={@page - 1}
-          class="font-mono text-[0.7rem] px-3 py-1.5 rounded-lg border border-black/12 text-black/60 hover:bg-black/5 transition-colors"
         >
           ← Prev
-        </button>
-        <button
+        </.button>
+        <.button
           :if={@page * @per_page < @total_count}
-          type="button"
+          variant={:ghost}
           phx-click={@change_event}
           phx-value-page={@page + 1}
-          class="font-mono text-[0.7rem] px-3 py-1.5 rounded-lg border border-black/12 text-black/60 hover:bg-black/5 transition-colors"
         >
           Next →
-        </button>
+        </.button>
       </div>
     </div>
     """

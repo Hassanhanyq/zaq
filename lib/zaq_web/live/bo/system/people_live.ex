@@ -13,6 +13,7 @@ defmodule ZaqWeb.Live.BO.System.PeopleLive do
   alias ZaqWeb.Components.DesignSystem.Button, as: DSButton
   alias ZaqWeb.Components.DesignSystem.EmptyState
   alias ZaqWeb.Components.DesignSystem.SimplePagination
+  alias ZaqWeb.Components.DesignSystem.Toggle, as: DSToggle
   alias ZaqWeb.Live.BO.System.PeopleTable
 
   def mount(_params, _session, socket) do
@@ -809,39 +810,6 @@ defmodule ZaqWeb.Live.BO.System.PeopleLive do
           Cancel
         </button>
       </div>
-    </div>
-    """
-  end
-
-  defp tabs_nav(assigns) do
-    ~H"""
-    <div class="flex border-b border-black/8">
-      <button
-        phx-click="switch_tab"
-        phx-value-tab="people"
-        class={[
-          "flex-1 font-mono text-[0.72rem] font-semibold py-3 transition-colors",
-          if(@active_tab == :people,
-            do: "zaq-text-accent border-b-2 border-[var(--zaq-color-accent)]",
-            else: "text-black/40 hover:text-black/60"
-          )
-        ]}
-      >
-        People
-      </button>
-      <button
-        phx-click="switch_tab"
-        phx-value-tab="teams"
-        class={[
-          "flex-1 font-mono text-[0.72rem] font-semibold py-3 transition-colors",
-          if(@active_tab == :teams,
-            do: "zaq-text-accent border-b-2 border-[var(--zaq-color-accent)]",
-            else: "text-black/40 hover:text-black/60"
-          )
-        ]}
-      >
-        Teams
-      </button>
     </div>
     """
   end

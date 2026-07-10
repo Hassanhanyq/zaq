@@ -136,6 +136,15 @@
   gap: var(--zaq-layout-inline-gap);
 }
 
+/* List panel footer — `ZaqWeb.Components.DesignSystem.SimplePagination` */
+.zaq-simple-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--zaq-scale-12) var(--zaq-scale-20);
+  background: var(--zaq-surface-color-raised);
+}
+
 /* ── File name: open preview (default → accent on hover) ─ */
 
 .zaq-table-preview-link {

@@ -14,7 +14,16 @@
   >
     <:master>
       <div class="bg-white rounded-xl border border-black/10">
-        <.tabs_nav active_tab={@active_tab} />
+        <DSToggle.toggle
+          value={Atom.to_string(@active_tab)}
+          event="switch_tab"
+          value_param="tab"
+          choices={[
+            %{value: "people", label: "People"},
+            %{value: "teams", label: "Teams"}
+          ]}
+          class="px-5 py-3 border-b border-black/8"
+        />
         <.people_tab
           :if={@active_tab == :people}
           people={@people}

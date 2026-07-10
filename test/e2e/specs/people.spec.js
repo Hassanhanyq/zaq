@@ -38,7 +38,7 @@ const SEL = {
   filterComplete: 'select[name="filter_complete"]',
 
   // Pagination
-  paginationInfo: 'span.font-mono',
+  paginationInfo: '[data-testid="simple-pagination-range"]',
   nextPage: 'button:has-text("Next →")',
   prevPage: 'button:has-text("← Prev")',
 
