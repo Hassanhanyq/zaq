@@ -41,6 +41,9 @@ defmodule Zaq.Agent.Executor do
     StreamEvents
   }
 
+  alias ReqLLM.Message.ContentPart
+
+  alias Zaq.Contracts.Record
   alias Zaq.Engine.Messages.{Incoming, Outgoing}
   alias Zaq.Engine.Telemetry
   alias Zaq.Event
@@ -167,9 +170,25 @@ defmodule Zaq.Agent.Executor do
     :ok = Telemetry.record("qa.custom_agent.execution.start", 1, dims)
 
     question =
-      opts
-      |> Keyword.get(:question, incoming.content)
-      |> timestamp_question()
+      case incoming.records do
+        [] ->
+          opts |> Keyword.get(:question, incoming.content) |> timestamp_question()
+
+        records ->
+          text =
+            opts
+            |> Keyword.get(:question, incoming.content)
+            |> timestamp_question()
+
+          materialized = Enum.map(records, &Record.build_materialized/1)
+
+          [
+            ContentPart.text(text)
+            | Enum.map(materialized, fn m ->
+                ContentPart.file(m.content, m.name, m.mime_type)
+              end)
+          ]
+      end
 
     result =
       with {:ok, configured_agent} <- selected_agent_result,

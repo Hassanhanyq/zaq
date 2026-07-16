@@ -111,6 +111,10 @@ defmodule Zaq.Agent.PipelineTest do
     def query_extraction(_query, _role_ids), do: {:ok, []}
   end
 
+  defmodule StubNoResultsDocumentProcessor do
+    def query_extraction(_query, _role_ids), do: {:error, :no_results, "no documents found"}
+  end
+
   defmodule StubAnswering do
     def system_prompt(_assigns), do: "system prompt"
     def no_answer?(_answer), do: false
@@ -462,6 +466,59 @@ defmodule Zaq.Agent.PipelineTest do
                :sum,
                :value
              ) == 1.0
+    end
+  end
+
+  describe "file attachment fallback" do
+    @incoming_with_records %Incoming{
+      content: "analyze this",
+      channel_id: "test",
+      provider: :test,
+      records: [%Zaq.Contracts.Record{id: "f1", kind: :file, content: "data", name: "file.txt"}]
+    }
+
+    test "retrieval fallback returns empty query when records present and retrieval has no results" do
+      opts =
+        @base_opts
+        |> Keyword.put(:retrieval, StubNoResultsRetrieval)
+
+      result = Pipeline.run(@incoming_with_records, opts)
+
+      assert %Outgoing{} = result
+      assert result.metadata.error == false
+    end
+
+    test "extraction fallback returns empty chunks when records present and extraction has no results" do
+      opts =
+        @base_opts
+        |> Keyword.put(:document_processor, StubNoResultsDocumentProcessor)
+
+      result = Pipeline.run(@incoming_with_records, opts)
+
+      assert %Outgoing{} = result
+      assert result.metadata.error == false
+    end
+
+    test "records present with successful retrieval still works normally" do
+      opts = @base_opts
+
+      result = Pipeline.run(@incoming_with_records, opts)
+
+      assert %Outgoing{} = result
+      assert result.body == "The answer is 42."
+      assert result.metadata.error == false
+    end
+
+    test "records present with both fallbacks activated returns a valid outgoing" do
+      opts =
+        @base_opts
+        |> Keyword.put(:retrieval, StubNoResultsRetrieval)
+        |> Keyword.put(:document_processor, StubNoResultsDocumentProcessor)
+
+      result = Pipeline.run(@incoming_with_records, opts)
+
+      assert %Outgoing{} = result
+      assert result.metadata.error == false
     end
   end
 end

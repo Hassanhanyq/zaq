@@ -99,11 +99,12 @@ defmodule Zaq.Agent.Pipeline do
          {:ok, retrieval_payload} <-
            hooks.dispatch_sync(:retrieval, %{content: content}, ctx),
          {:ok, retrieval_result} <-
-           do_retrieval(retrieval_payload.content, history, opts, incoming),
+           do_retrieval_fallback(retrieval_payload.content, history, opts, incoming),
          :ok <- hooks.dispatch_async(:retrieval_complete, retrieval_result, ctx),
          {:ok, answering_payload} <-
            hooks.dispatch_sync(:answering, retrieval_result, ctx),
-         {:ok, extraction_result} <- do_extraction(answering_payload, opts, incoming),
+         {:ok, extraction_result} <-
+           do_extraction_fallback(answering_payload, opts, incoming),
          {:ok, answer_result} <-
            do_answering(incoming, content, extraction_result, answering_payload, history, opts) do
       :ok = hooks.dispatch_async(:answer_generated, %{answer: answer_result}, ctx)
@@ -242,6 +243,40 @@ defmodule Zaq.Agent.Pipeline do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  defp do_retrieval_fallback(clean_msg, history, opts, %{records: records} = incoming)
+       when records != [] do
+    case do_retrieval(clean_msg, history, opts, incoming) do
+      {:ok, result} ->
+        {:ok, result}
+
+      {:error, :no_results, _} ->
+        {:ok, %{query: "", language: "en", positive_answer: nil, negative_answer: nil}}
+
+      {:error, :no_results} ->
+        {:ok, %{query: "", language: "en", positive_answer: nil, negative_answer: nil}}
+
+      error ->
+        error
+    end
+  end
+
+  defp do_retrieval_fallback(clean_msg, history, opts, incoming) do
+    do_retrieval(clean_msg, history, opts, incoming)
+  end
+
+  defp do_extraction_fallback(answering_payload, opts, %{records: records} = incoming)
+       when records != [] do
+    case do_extraction(answering_payload, opts, incoming) do
+      {:ok, chunks} -> {:ok, chunks}
+      {:error, :no_results, _} -> {:ok, []}
+      {:error, _} -> {:ok, []}
+    end
+  end
+
+  defp do_extraction_fallback(answering_payload, opts, incoming) do
+    do_extraction(answering_payload, opts, incoming)
   end
 
   defp do_answering(incoming, content, query_results, retrieval, history, opts) do

@@ -75,4 +75,39 @@ defmodule Zaq.Contracts.Record do
           attributes: map(),
           raw: map()
         }
+
+  defmodule Materialized do
+    @moduledoc "Materalized record struct"
+    @enforce_keys [:id, :content, :name, :mime_type, :size]
+    defstruct [:id, :content, :name, :mime_type, :size]
+
+    @type t :: %__MODULE__{
+            id: String.t(),
+            content: binary(),
+            name: String.t(),
+            mime_type: String.t(),
+            size: non_neg_integer()
+          }
+  end
+
+  @doc """
+  Builds a `%Materialized{}` struct from a `%Record{}`.
+  When `content` is already populated it wraps it directly.
+  When `path` is present it reads the file.
+  """
+  @spec build_materialized(t()) :: Materialized.t()
+  def build_materialized(%__MODULE__{content: content} = record) when is_binary(content) do
+    %Materialized{
+      id: record.id,
+      content: content,
+      name: record.name || Path.basename(record.path || ""),
+      mime_type: record.mime_type || "application/octet-stream",
+      size: record.size || byte_size(content)
+    }
+  end
+
+  def build_materialized(%__MODULE__{path: path} = record) when is_binary(path) do
+    content = File.read!(path)
+    build_materialized(%{record | content: content, size: byte_size(content)})
+  end
 end

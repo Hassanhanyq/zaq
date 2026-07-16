@@ -592,5 +592,65 @@ defmodule Zaq.Agent.ExecutorTest do
       assert_received {:coverage_ask, {:raw_question, "keep as-is"}, _configured_agent,
                        _tool_context}
     end
+
+    test "sends content as binary string when incoming has no records" do
+      incoming = %Incoming{content: "hello", channel_id: "c1", provider: :web, person: %{id: 16}}
+
+      Executor.run(incoming,
+        agent_id: "stub",
+        agent_module: CoverageStubAgent,
+        server_manager_module: CoverageStubServerManager,
+        factory_module: CoverageStubFactory,
+        status_module: CoverageStubStatus,
+        node_router: StubNodeRouter,
+        scope: "coverage"
+      )
+
+      assert_received {:coverage_ask, content, _configured_agent, _tool_context}
+      assert is_binary(content)
+      assert String.contains?(content, "hello")
+    end
+
+    test "sends multi-part content when incoming has records" do
+      alias Zaq.Contracts.Record
+
+      incoming = %Incoming{
+        content: "analyze this file",
+        channel_id: "c1",
+        provider: :web,
+        person: %{id: 17},
+        records: [
+          %Record{
+            id: "f1",
+            kind: :file,
+            content: "file content here",
+            name: "test.txt",
+            mime_type: "text/plain",
+            size: 16
+          }
+        ]
+      }
+
+      Executor.run(incoming,
+        agent_id: "stub",
+        agent_module: CoverageStubAgent,
+        server_manager_module: CoverageStubServerManager,
+        factory_module: CoverageStubFactory,
+        status_module: CoverageStubStatus,
+        node_router: StubNodeRouter,
+        scope: "coverage"
+      )
+
+      assert_received {:coverage_ask, content_parts, _configured_agent, _tool_context}
+      assert is_list(content_parts)
+      [text_part | file_parts] = content_parts
+      assert text_part.type == :text
+      assert String.contains?(text_part.text, "analyze this file")
+      assert length(file_parts) == 1
+      [file_part] = file_parts
+      assert file_part.type == :file
+      assert file_part.data == "file content here"
+      assert file_part.filename == "test.txt"
+    end
   end
 end

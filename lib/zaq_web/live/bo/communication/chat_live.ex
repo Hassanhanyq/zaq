@@ -13,9 +13,11 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLive do
   on_mount {ZaqWeb.Live.BO.Communication.ServiceGate, [:agent, :ingestion]}
 
   alias Zaq.Agent.{CitationNormalizer, ErrorMessage, History}
+  alias Zaq.Contracts.Record
   alias Zaq.Engine.Messages.{Incoming, Outgoing}
   alias Zaq.Event
   alias Zaq.Ingestion.ContentSource
+  alias Zaq.Ingestion.FileExplorer
   alias Zaq.NodeRouter
   alias Zaq.RuntimeDeps
   alias ZaqWeb.Live.BO.Communication.MessageHelpers
@@ -643,6 +645,28 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLive do
        ) do
     source_filter = Enum.map(active_filters, & &1.source_prefix)
 
+    file_filters = Enum.filter(active_filters, &(&1.type == :file))
+
+    file_records =
+      file_filters
+      |> Enum.flat_map(fn filter ->
+        case FileExplorer.resolve_path(filter.source_prefix) do
+          {:ok, abs_path} ->
+            [
+              %Record{
+                id: "bo_file:#{filter.source_prefix}",
+                kind: :file,
+                name: filter.label,
+                path: abs_path,
+                mime_type: MIME.from_path(filter.label)
+              }
+            ]
+
+          _ ->
+            []
+        end
+      end)
+
     incoming =
       Incoming.new(%{
         content: user_msg,
@@ -652,6 +676,7 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLive do
         provider: :web,
         person: current_user_person(current_user),
         content_filter: source_filter,
+        records: file_records,
         metadata: %{
           session_id: session_id,
           request_id: request_id,

@@ -149,10 +149,10 @@ defmodule Zaq.Agent.Factory do
   - `:context` — map passed into retrieval for permission scoping (`:person_id`, `:team_ids`)
   - Any other opts are forwarded to the underlying `Jido.AI.Agent` ask call
   """
-  @spec ask_with_config(GenServer.server(), String.t(), ConfiguredAgent.t(), keyword()) ::
+  @spec ask_with_config(GenServer.server(), String.t() | [term()], ConfiguredAgent.t(), keyword()) ::
           {:ok, %{request: term(), events: Enumerable.t()}} | {:error, term()}
   def ask_with_config(server, query, %ConfiguredAgent{} = configured_agent, opts \\ [])
-      when is_binary(query) do
+      when is_binary(query) or is_list(query) do
     with {:ok, config} <- server_runtime_config(server, configured_agent),
          :ok <- ensure_system_prompt(server, effective_system_prompt(configured_agent)) do
       ask_opts =

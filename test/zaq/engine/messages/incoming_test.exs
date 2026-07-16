@@ -171,6 +171,28 @@ defmodule Zaq.Engine.Messages.IncomingTest do
     assert Incoming.team_ids(msg) == [7, 8]
   end
 
+  test "new/1 defaults records to empty list" do
+    msg = Incoming.new(%{content: "hi", channel_id: "ch1", provider: :slack})
+
+    assert msg.records == []
+  end
+
+  test "new/1 passes records through when provided" do
+    records = [
+      %Zaq.Contracts.Record{id: "f1", kind: :file, path: "/tmp/test.txt"}
+    ]
+
+    msg =
+      Incoming.new(%{
+        content: "hi",
+        channel_id: "ch1",
+        provider: :web,
+        records: records
+      })
+
+    assert msg.records == records
+  end
+
   describe "new/1 required keys" do
     test "raises ArgumentError when :content key is missing" do
       attrs = %{channel_id: "ch1", provider: :mattermost}

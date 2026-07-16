@@ -28,7 +28,8 @@ defmodule Zaq.Engine.Messages.Incoming do
     :person,
     is_dm: false,
     metadata: %{},
-    content_filter: []
+    content_filter: [],
+    records: []
   ]
 
   @type t :: %__MODULE__{
@@ -42,7 +43,8 @@ defmodule Zaq.Engine.Messages.Incoming do
           person: map() | nil,
           is_dm: boolean(),
           metadata: map(),
-          content_filter: [String.t()]
+          content_filter: [String.t()],
+          records: [Zaq.Contracts.Record.Materialized.t()] | [Zaq.Contracts.Record.t()]
         }
 
   @doc "Builds the canonical incoming payload and injects telemetry dimensions into metadata."
@@ -61,7 +63,8 @@ defmodule Zaq.Engine.Messages.Incoming do
       person: normalize_person(fetch_optional(attrs, :person)),
       is_dm: fetch_optional(attrs, :is_dm) == true,
       content_filter: normalize_content_filter(fetch_optional(attrs, :content_filter)),
-      metadata: metadata
+      metadata: metadata,
+      records: fetch_optional(attrs, :records) || []
     }
 
     put_telemetry_dimensions(incoming, attrs)

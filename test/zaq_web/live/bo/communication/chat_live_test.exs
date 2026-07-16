@@ -1948,6 +1948,85 @@ defmodule ZaqWeb.Live.BO.Communication.ChatLiveTest do
     end)
   end
 
+  test "send_message with file filter passes records to Incoming", %{conn: conn} do
+    tmp_dir = Path.join(["/tmp", "zaq_chat_file_test_#{System.unique_integer([:positive])}"])
+    file_path = Path.join([tmp_dir, "documents", "hr", "policy.md"])
+    File.mkdir_p!(Path.dirname(file_path))
+    File.write!(file_path, "company policy content")
+
+    original_ingestion = Application.get_env(:zaq, Zaq.Ingestion)
+    Application.put_env(:zaq, Zaq.Ingestion, base_path: tmp_dir)
+
+    on_exit(fn ->
+      Application.put_env(:zaq, Zaq.Ingestion, original_ingestion || [])
+      File.rm_rf!(tmp_dir)
+    end)
+
+    caller = self()
+
+    NodeRouterFake.put_dispatch(fn %Zaq.Event{} = event ->
+      send(caller, {:chat_file_event, event})
+      %{event | response: {:error, :test_complete}}
+    end)
+
+    {:ok, view, _html} = live(conn, ~p"/bo/chat")
+
+    render_hook(view, "add_content_filter", %{
+      "source_prefix" => "documents/hr/policy.md",
+      "connector" => "documents",
+      "label" => "policy.md",
+      "type" => "file"
+    })
+
+    assert_eventually(fn ->
+      state = :sys.get_state(view.pid)
+      length(state.socket.assigns.active_filters) == 1
+    end)
+
+    view |> element("#chat-form") |> render_submit(%{"message" => "summarize this file"})
+
+    assert_receive {:chat_file_event, %Zaq.Event{} = dispatched}, 2_000
+
+    incoming = dispatched.request
+    assert incoming.records != []
+    assert length(incoming.records) == 1
+
+    [record] = incoming.records
+    assert record.kind == :file
+    assert record.name == "policy.md"
+    assert record.path == file_path
+  end
+
+  test "send_message with unresolvable file filter omits that record gracefully", %{conn: conn} do
+    caller = self()
+
+    NodeRouterFake.put_dispatch(fn %Zaq.Event{} = event ->
+      send(caller, {:chat_file_event, event})
+      %{event | response: {:error, :test_complete}}
+    end)
+
+    {:ok, view, _html} = live(conn, ~p"/bo/chat")
+
+    render_hook(view, "add_content_filter", %{
+      "source_prefix" => "../../etc/passwd",
+      "connector" => "documents",
+      "label" => "traversal.txt",
+      "type" => "file"
+    })
+
+    assert_eventually(fn ->
+      state = :sys.get_state(view.pid)
+      length(state.socket.assigns.active_filters) == 1
+    end)
+
+    view |> element("#chat-form") |> render_submit(%{"message" => "read this"})
+
+    assert_receive {:chat_file_event, %Zaq.Event{} = dispatched}, 2_000
+
+    incoming = dispatched.request
+    assert incoming.records == []
+  end
+
   test "title_updated leaves non-matching conversations unchanged", %{conn: conn, user: user} do
     {:ok, conv} =
       Conversations.create_conversation(%{
