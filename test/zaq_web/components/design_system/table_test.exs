@@ -3,12 +3,17 @@ defmodule ZaqWeb.Components.DesignSystem.TableTest do
 
   import Phoenix.Component
   import Phoenix.LiveViewTest
+  import Zaq.TimezoneTestHelpers
   import ZaqWeb.Helpers.DateFormat, only: [format_datetime: 1]
 
   alias ZaqWeb.Components.DesignSystem.Table
   alias ZaqWeb.Components.DesignSystem.Table.Grid
 
   @dt ~U[2025-03-13 14:05:00Z]
+
+  setup do
+    stub_system_timezone()
+  end
 
   test "table/1 renders zaq-table shell and body rows" do
     html =
